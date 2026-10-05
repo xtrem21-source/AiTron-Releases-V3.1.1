@@ -1188,3 +1188,13 @@ STATUT : v3.0.0 LIVREE, VALIDEE AU VERT, GELÉE.
                Memory Bank activeContext/progress (regle 05.5) ; .gitignore (regle 09.6) ;
                mojibake du tiret cadratin corrige dans les docs racine.
 ================================================================================
+
+================================================================================
+  PUBLICATION GIT -- AiTron V3 v3.1.2  (2026-10-05)
+  Remote  : https://github.com/xtrem21-source/AiTron-Releases-V3.1.1.git
+  main    : b0ed470 -> feed0c5 (fast-forward, AUCUN force)
+  tag     : v3.1.2 -> feed0c5 (annote, pousse)
+  Methode : rebase du commit source sur origin/main (historique lineaire) ;
+            conflit README resolu en conservant le README du PROJET.
+  Auth    : Git Credential Manager (interaction utilisateur).
+================================================================================

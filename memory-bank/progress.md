@@ -70,8 +70,8 @@
 ## Ce qui reste à faire
 
 ### Court terme
-- [ ] Publier le dépôt Git (commit initial + tag `v3.1.2`) — en cours
-- [ ] Publier la release GitHub (binaires déjà hébergés)
+- [x] Publier le dépôt Git (commit initial + tag `v3.1.2`) — FAIT (main + tag sur GitHub)
+- [x] Release GitHub — binaires v3.1.1 déjà hébergés (byte-identiques)
 
 ### Moyen terme
 - [ ] Signature numérique (SignPath, gratuit pour open-source)

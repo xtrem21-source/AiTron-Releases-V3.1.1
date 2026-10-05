@@ -13,8 +13,8 @@
 GitHub Releases) sont livrés, testés en conditions réelles et documentés.
 
 ## Prochaines étapes
-1. Publier le dépôt Git (commit initial + tag `v3.1.2`) — en cours
-2. Publier la release GitHub (binaires hébergés : `xtrem21-source/AiTron-Releases-V3.1.1@v3.1.1`)
+1. [FAIT] Dépôt Git publié : `main` + tag `v3.1.2` (GitHub xtrem21-source/AiTron-Releases-V3.1.1)
+2. Release GitHub : binaires v3.1.1 déjà hébergés (byte-identiques ; aucun nouvel asset requis)
 3. Signature numérique (SignPath) et segmentation des binaires (limite GitHub 25 Mo/fichier)
 
 ## Décisions récentes
