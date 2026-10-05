@@ -1,0 +1,85 @@
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1036{\fonttbl{\f0\fnil\fcharset0 Calibri;}{\f1\fnil Calibri;}{\f2\fnil\fcharset1 Segoe UI Symbol;}{\f3\fnil\fcharset238 Calibri;}}
+{\*\generator Riched20 10.0.29639}\viewkind4\uc1 
+\pard\sa200\sl276\slmult1\f0\fs22\lang12 MANDAT TECHNIQUE ET DIRECTIVE D'EX\'c9CUTION GLOBALE ET S\'c9QUENTIELLE \f1\emdash  VERSIONS v1.5.0 & v1.6.0\par
+Sandbox cible : G:\\V1\\LocalAI-Projet\\\par
+Version d'origine : v1.4.0 \f2\u10132?\f0  Version finale vis\'e9e : v1.6.0 (Incr\'e9mentation par jalons \'e9tanches)\par
+\par
+Bonjour Cline. Tu agis en tant qu'Ing\'e9nieur principal en Assurance Qualit\'e9 (QA) global et D\'e9veloppeur Senior Full-Stack. Ce mandat unifi\'e9 est ta feuille de route exclusive pour concevoir, impl\'e9menter et valider les versions v1.5.0 et v1.6.0 de notre \'e9cosyst\'e8me LocalAI natif sous Windows, sans Docker et sans WSL.\par
+\par
+Tu as l'obligation absolue de respecter notre charte constitutionnelle (CHARTE.md). Tu op\'e8res en autonomie totale (mode a) : tu installes, tu codes, tu testes et tu appliques l'auto-healing jusqu'\'e0 l'obtention d'un produit irr\'e9prochable.\par
+\par
+================================================================================\par
+ PROTOCOLE S\'c9QUENTIEL \'c0 JALONS EXCLUSIFS AVEC "STOP" OBLIGATOIRE\par
+================================================================================\par
+Tu as l'interdiction stricte de coder tout le mandat d'un coup. Tu dois suivre cette chronologie exacte :\par
+- JALON 0 : Sauvegarde ante-ex\'e9cution.\par
+- JALON 1 : Mode B\'eata-Testeur Fou sur la v1.4.0 active (STOP complet et validation de l'existant).\par
+- JALON 2 : Impl\'e9mentation compl\'e8te de la v1.5.0 (Vision locale corrig\'e9e + SDK MCP).\par
+- JALON 3 : Mode B\'eata-Testeur Fou sur la v1.5.0 (STOP complet, validation physique et consolidation avant v1.6.0).\par
+- JALON 4 : Impl\'e9mentation compl\'e8te de la v1.6.0 (GraphRAG par LLM + Failover SSE d\'e9terministe).\par
+- JALON 5 : Mode B\'eata-Testeur Fou final sur la v1.6.0 (STOP complet, rapport final et gel).\par
+\par
+================================================================================\par
+JALON 0 & 1 \f1\emdash  SAUVEGARDE ET TEST DE RUPTURE INITIAL (STOP OBLIGATOIRE)\par
+================================================================================\par
+1. SAUVEGARDE ANTE-EX\f0\'c9CUTION : Appelle imm\'e9diatement la routine 'archive_installer()' au sommet de ton main() pour copier le script ma\'eetre 'install_localai_win.py' vers 'Installeur\\' au format horodat\'e9 strict.\par
+2. MODE B\'caTA-TESTEUR FOU PR\'c9-CODE (STOP) : Fais un arr\'eat complet. Avant d'\'e9crire la moindre ligne de code pour la v1.5.0, \'e9prouve l'infrastructure v1.4.0 actuelle (Inf\'e9rence texte, requ\'eates RAG avec la commande 'Run-LocalAI.bat index', connectivit\'e9 des ports 4000, 8080, 8090). Si un bug r\'e9siduel est d\'e9tect\'e9, applique l'auto-healing et stabilise la v1.4.0 avant de poursuivre.\par
+\par
+================================================================================\par
+JALON 2 & 3 \f1\emdash  VERSION v1.5.0 : VISION LOCALE & PROTOCOLE SDK MCP (STOP)\par
+================================================================================\par
+Une fois le Jalon 1 valid\f0\'e9 au vert, passe \'e0 l'impl\'e9mentation exclusive de la v1.5.0 :\par
+\par
+1. VISION LOCALE MULTI-MODALE CORRIG\'c9E :\par
+   - L'argument de projection de vision `--mmproj` exige un fichier projecteur compatible. Pour chaque mod\'e8le multimodal (ex: Llama-3.2-Vision, Qwen2-VL), le fichier `models-catalog.json` doit obligatoirement encapsuler deux URLs : le mod\'e8le principal GGUF et son projecteur `mmproj.gguf` d\'e9di\'e9.\par
+   - Le script de t\'e9l\'e9chargement (`download_model.bat`) et le gestionnaire doivent traiter ce t\'e9l\'e9chargement de mani\'e8re atomique (les deux fichiers ou rien).\par
+   - Configure l'orchestration pour injecter l'argument `--mmproj models/mmproj_specifique.gguf` lors de l'appel \'e0 `llama-server.exe`.\par
+   - Int\'e8gre les images extraites par ton pipeline RAG (.png, .jpg) dans les m\'e9tadonn\'e9es de l'index contextuel.\par
+\par
+2. PROTOCOLE MCP S\'c9CURIS\'c9 (SDK OFFICIEL VIA PYTHON EMBED) :\par
+   - N'essaie pas de r\'e9impl\'e9menter MCP from scratch. Installe de mani\'e8re isol\'e9e le SDK officiel d'Anthropic via pip (`pip install mcp --target LocalAI\\runtime\\python\\Lib\\site-packages`) dans ton environnement Python embarqu\'e9.\par
+   - Configure ton 'Agent Hub' pour consommer ce SDK en mode standardis\'e9 (JSON-RPC 2.0 sur stdio/HTTP), assurant une compatibilit\'e9 parfaite avec la sp\'e9cification MCP 2024-11-05.\par
+   - Centralise l'enregistrement et la d\'e9claration des outils (Tools) connect\'e9s dans le fichier : `LocalAI\\config\\mcp-settings.json`\par
+\par
+3. MODE B\'caTA-TESTEUR FOU v1.5.0 (STOP) : Fais un nouveau STOP complet. \'c9prouve intensivement ta brique v1.5.0 :\par
+   - Valide une requ\'eate d'inf\'e9rence avec image locale.\par
+   - Force l'appel d'un outil via ton client MCP (ex: list_tools, call_tool), v\'e9rifie la propret\'e9 des payloads.\par
+   - Si tout est fonctionnel, consigne la r\'e9ussite dans `dev\\patch_integrity.log`, capture les anomalies bloqu\'e9es dans `dev\\crash.log` (cat\'e9gories GPU_VISION, MCP_GATEWAY), passe la version globale et le manifest \'e0 "v1.5.0", mets \'e0 jour `INSTALLATION.md` et attends le feu vert pour le jalon suivant.\par
+\par
+================================================================================\par
+JALON 4 & 5 \f1\emdash  VERSION v1.6.0 : GRAPHRAG PAR LLM & FAILOVER SSE D\f0\'c9TERMINISTE\par
+================================================================================\par
+N'encha\'eene cette \'e9tape que si le jalon pr\'e9c\'e9dent est consolid\'e9 au vert stable.\par
+\par
+1. INDEXATION GRAPHRAG S\'c9CURIS\'c9E (EXTRACTION PAR MODEL LOCAL) :\par
+   - Pour \'e9viter les graphes pauvres issus d'heuristiques par expressions r\'e9guli\'e8res (regex), ton script Python de GraphRAG doit d\'e9l\'e9guer l'extraction d'entit\'e9s (NER) et de relations (RE) \'e0 `llama-server.exe` en pur local via des requ\'eates structur\'e9es de prompt.\par
+   - S\'e9rialise le graphe r\'e9sultant (n\f3\u339?uds, ar\f0\'eates, propri\'e9t\'e9s d'interd\'e9pendance structurelle du code source) \'e0 plat dans : `LocalAI\\runtime\\storage\\graph_db.json`\par
+\par
+2. FAILOVER SSE TRANSPARENT AVEC BUFFERISATION :\par
+   - Le flux Server-Sent Events (SSE) \'e9tant unidirectionnel et dynamique, si `llama-server.exe` subit un crash de VRAM (Out-of-Memory) ou une erreur HTTP 500 au milieu d'une g\'e9n\'e9ration critique demand\'e9e par Cline, le proxy doit appliquer la strat\'e9gie de la BUFFERISATION COMPL\'c8TE AVANT ENVOI sur les requ\'eates identifi\'e9es comme sensibles ou provenant de l'agent.\par
+   - Si une erreur r\'e9seau ou mat\'e9rielle survient avant la fin du buffer, le proxy intercepte le signal, rejoue silencieusement la requ\'eate sur ton mod\'e8le local secondaire (CPU/NPU) ou une cl\'e9 cloud de secours (`config\\cloud-keys.env`), et d\'e9livre la r\'e9ponse propre au client en moins de 1.5s, pr\'e9servant l'int\'e9grit\'e9 de la session de Cline.\par
+   - Pour les requ\'eates de routine en streaming temps r\'e9el pur, le proxy appliquera le FAILOVER SUR ERREUR AVANT LE PREMIER TOKEN (si le moteur primaire est indisponible au d\'e9marrage, bascule imm\'e9diate sur l'API cloud avant d'ouvrir le flux r\'e9seau vers Cline).\par
+\par
+3. COMMANDES CLI D'ORCHESTRATION :\par
+   - `Run-LocalAI.bat graph-show` : Analyse et affiche les statistiques de ton graphe d'entit\'e9s local.\par
+   - `Run-LocalAI.bat mcp-list` : Liste les serveurs et outils MCP actifs d\'e9clar\'e9s.\par
+\par
+4. MODE B\'caTA-TESTEUR FOU FINAL v1.6.0 (STOP) : \'c9prouve l'int\'e9gralit\'e9 du syst\'e8me combin\'e9 :\par
+   - Simule une panne mat\'e9rielle (kill du processus llama-server primaire) au d\'e9marrage et pendant une requ\'eate bufferis\'e9e, valide que le proxy assures la redirection sans couper Cline dans VS Code.\par
+   - Ex\'e9cute une indexation GraphRAG sur ton code source.\par
+   - V\'e9rifie qu'aucun processus zombie ne survit \'e0 l'arr\'eat g\'e9n\'e9ral (v\'e9rification de `runtime\\pids.json` et lib\'e9ration de la VRAM).\par
+5. CONSOLIDATION ET LIVRAISON : \'c9cris le rapport final d'\'e9valuation dans `dev\\BETA_TEST_REPORT.md`, valide ton AST, passe la version finale globale \'e0 "v1.6.0" partout et g\'e9n\'e8re ta sauvegarde de cl\'f4ture dans `Installeur\\`. STOP complet en fin de traitement.\par
+\par
+================================================================================\par
+CLAUSE D'AUTO-R\'c9GULATION (S\'c9CURIT\'c9 DE CONTEXTE ET FLEXIBILIT\'c9)\par
+================================================================================\par
+Si tu estimes, en cours de route, que la charge du Jalon 2 (v1.5.0) ou du Jalon 4 (v1.6.0) d\'e9passe ta capacit\'e9 de traitement en un seul passage ou sature les limites de ta fen\'eatre de contexte, tu es explicitement autoris\'e9 \'e0 subdiviser chaque jalon majeur en sous-\'e9tapes internes (ex : v1.5.0a Vision seule, v1.5.0b int\'e9gration du SDK MCP). \par
+\par
+Si tu choisis d'activer cette sous-\'e9tape :\par
+1. Documente imm\'e9diatement ce choix et sa justification technique et contextuelle dans 'dev\\DECISIONS.md'.\par
+2. Livre, teste et valide chaque sous-\'e9tape au vert avant d'encha\'eener sur la suivante.\par
+La doctrine transactionnelle reste inchang\'e9e : sauvegarde ante-ex\'e9cution, patch chirurgical, test et validation AST \'e0 chaque sous-\'e9tape interne.\par
+\par
+Ex\'e9cute l'int\'e9gralit\'e9 de ce grand chantier de mani\'e8re autonome et livre la version v1.6.0 stabilis\'e9e au vert. Tu peux commencer.\par
+}
+ 

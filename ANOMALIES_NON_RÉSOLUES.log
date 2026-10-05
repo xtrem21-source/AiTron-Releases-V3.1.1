@@ -1,0 +1,190 @@
+================================================================================
+ANOMALIES_NON RESOLUES - AiTron V3 v3.0.0
+Fichier racine exige par le mandat PHASE V3 Finale (JALON 5, point 2).
+Date de production : 2026-10-03
+--------------------------------------------------------------------------------
+PERIMETRE DE L'INSPECTION
+  Inspection exhaustive des fichiers de code generes, des journaux internes
+  (dev\crash.log, dev\patch_integrity.log, log\install_*.log, logs\*.log) et des
+  traces d'execution techniques, a la recherche d'erreurs muettes ou non resolues.
+--------------------------------------------------------------------------------
+NOTE v3.1.0 (20261004) - LIRE AVANT LA SYNTHESE CI-DESSOUS
+  Les lignes v3.0.0 ci-dessus et ci-dessous refletent l'etat a cette version. La section
+  v3.1.0 (en fin de fichier) ajoute les anomalies detectees et corrigees lors de l'audit Pro.
+  La phrase "AUCUN DEFAUT RESIDUEL" ci-dessous n'est donc plus un constat valable pour la v3.0.0 :
+  l'audit v3.1.0 a mis en evidence 11 defauts reels de notre code (tous corriges, voir fin de fichier).
+--------------------------------------------------------------------------------
+SYNTHESE HONNETE
+  AUCUN DEFAUT RESIDUEL NON RESOLU DANS LE CODE DU PRODUIT.
+  Tous les defauts reellement detectes au cours du chantier ont ete CORRIGES et
+  RE-TESTES (auto-healing) : A1, A2, A3 (profil apprenant), T1, T2 (harnais beta
+  v2.0.0), B1, B2, B3, B4, B5 (i18n v2.1.1), H1, H2, H3 (v2.1.0), A24/A26 (noms
+  d'options et de binaires upstream).
+  Les entrees ci-dessous ne sont PAS des defauts de notre code : ce sont des
+  LIMITES AMONT ou des CARACTERISTIQUES DU PRODUIT, documentees, contournees et
+  non corrigeables cote portage. Elles sont consignees par transparence, au
+  format standardise exige par le mandat.
+================================================================================
+
+[20261003_224500] [GPU_DETECT] [WARN] Support NPU AMD XDNA2 via DirectML : experimental et NON fonctionnel
+Impact : Sur une plateforme AMD, l'acceleration NPU n'est pas exploitable via DirectML. L'inference
+         reste possible mais en repli CPU (calcul NumPy natif), donc plus lente que sur GPU.
+Contournement : Repli CPU NumPy automatique et maitrise ; GPU NVIDIA via Vulkan si present
+         (validee et testee sur le poste de reference).
+Recommandation : Conserver l'architecture de repli en cascade. Ne pas annoncer de support NPU AMD ;
+         suivre l'evolution amont de DirectML.
+---
+[20261003_224500] [GPU_VRAM] [INFO] Decodage speculatif : aucun gain mesure sur materiel GPU-bound
+Impact : L'activation du decodage speculatif n'apporte pas de gain sur le poste de reference
+         (21,39 tok/s contre 21,76 sans), le facteur limitant etant le GPU et non le CPU.
+Contournement : Mode OPT-IN via la variable d'environnement AITRON_SPEC=1 ; inactif par defaut.
+Recommandation : Reactiver le mode uniquement sur une configuration reellement CPU-bound.
+Documentation : dev\DECISIONS.md D-039.
+---
+[20261003_224500] [OTHER] [INFO] Precision du modele de vision sur images synthetiques
+Impact : Le modele VLM embarque (2B) decrit de facon generique des formes geometriques synthetiques.
+         Le PIPELINE (modele + mmproj, image transmise, generation produite) est valide ; la
+         precision releve de la CAPACITE du modele, non du portage.
+Contournement : Utiliser un modele de vision de plus grande taille pour les taches exigeantes.
+Recommandation : Ne pas modifier le portage ; ajuster le choix de modele selon l'usage.
+---
+
+[20261003_224500] [PROXY_GATEWAY] [INFO] Le gateway LiteLLM exige une authentification (HTTP 401 sans cle)
+Impact : Un appel a http://127.0.0.1:4000/v1/models sans en-tete d'autorisation renvoie 401.
+         Comportement ATTENDU et voulu (le coeur local est nu, le gateway authentifie).
+Contournement : Envoyer l'en-tete Authorization: Bearer sk-local (cle interne locale).
+Recommandation : Ne pas ouvrir le gateway ; comportement documente dans INSTALLATION.md.
+---
+[20261003_224500] [OTHER] [INFO] whisper.cpp n'expose pas la route /v1/models
+Impact : Une sonde /v1/models sur le port 8091 renvoie 404 (l'amont n'expose pas cette route).
+         Le service est sain : il repond 200 sur / et /health.
+Contournement : Utiliser / ou /health pour le controle de sante de Whisper.
+Recommandation : Aucune (limite de l'amont whisper.cpp, non corrigeable cote portage).
+---
+[20261003_224500] [RENAME] [INFO] Chemin de sandbox different du libelle du mandat
+Impact : Le mandat PHASE V3 cite une sandbox "G:\Projet\" ; la sandbox reelle du chantier est
+         "G:\V1\LocalAI-Projet\". Le renommage du repertoire de sandbox est hors perimetre
+         (il contient la session en cours) et n'a pas ete effectue.
+Contournement : Tous les livrables racine exiges par le mandat sont produits a la racine de la
+         sandbox REELLE (ANOMALIES_NON_RESOLUES.log, INSTALLATION.md, INSTALLATION.fr.md,
+         INSTALLATION.en.md, install_AiTron_v3.py, AiTron\).
+Recommandation : Lire "racine de la sandbox" comme "G:\V1\LocalAI-Projet\" pour ce chantier.
+Documentation : dev\DECISIONS.md D-044.
+---
+[20261003_224500] [AUTONOMY_AUDIT] [INFO] Cout d'E/S des reconstructions (heritage des modeles)
+Impact : Chaque deploiement recopie les elements d'heritage (dont ~6 Go de modeles GGUF) vers
+         l'arbre de staging, ce qui allonge sensiblement la duree d'installation.
+Contournement : Option --prev <chemin> pour choisir explicitement la source d'heritage, et
+         --skip-model pour eviter les telechargements. Pour l'audit d'autonomie, la sauvegarde
+         est un DEPLACEMENT (renommage, sans copie).
+Recommandation : Si les temps d'installation deviennent genants, envisager un heritage par lien
+         materiel (hardlink) pour les modeles, sans changer la semantique.
+---
+[20261003_224500] [I18N] [INFO] Rafraichissement des cles de documentation conditionne a I18N_REV
+Impact : Les cles help_*/tip_* du fichier i18n\<lang>.json ne sont rafraichies depuis la couche
+         embarquee que si _i18n_rev differe de la constante I18N_REV du script.
+Contournement : Incrementer I18N_REV (fait : "1" -> "2" pour propager les mises a jour textuelles
+         de la v3.0.0) ; `i18n.py init --force` regenere integralement les fichiers.
+Recommandation : Incrementer I18N_REV a chaque evolution des textes d'aide.
+Documentation : dev\DECISIONS.md D-043.
+---
+================================================================================
+[20261003_224500] [QA] AUCUNE ANOMALIE DE NOTRE CODE NON RESOLUE - PRODUIT AU VERT
+  Les entrees ci-dessus sont des limites amont ou des caracteristiques documentees,
+  toutes dotees d'un contournement fonctionnel et d'une recommandation.
+  Etat final : AST VERT, v3.0.0, 87 composants, zero zombie, reconstruction
+  mono-bloc verifiee.
+================================================================================
+
+================================================================================
+AUDIT v3.1.0 (20261004) - ANOMALIES DE NOTRE CODE, DETECTEES EN CONDITIONS REELLES
+Staging : dev\test_dynamique\AiTron\ . Mesure avant correctif, re-test apres.
+================================================================================
+
+[20261004_030117] [UI_I18N] [ERROR] IHM embarquee : 920 cles sans traduction francaise (42,4 % de couverture)
+Impact : admin (234), auth (92), importModel (96), media (366) et complements de chat/home/models
+         (132) restaient en anglais en mode FR. Le francais etait totalement absent de l'IHM.
+Contournement : repli anglais automatique (fallbackLng=en) ; aucun ecran casse.
+Recommandation / Action corrective appliquee : 920 cles traduites, IHM et coeur recompiles, staging
+         redeploye (--prev vers la sauvegarde v3.0.0). Mesure sur l'IHM SERVIE : 1 597 / 1 597 cles
+         EN couvertes (100,0 %), 0 placeholder divergent, 0 BOM (build\audit\ui_full_check.py).
+Statut : RESOLU PAR AUTO-HEALING (20261004, apres une premiere passe qui avait refuse la certification)
+---
+
+[20261004_030117] [CLI_ENCODING] [ERROR] Invocations simultanees de Run-LocalAI.bat : 7 sur 8 en echec
+Impact : fichier data\lang.tmp partage ; "fichier utilise par un autre processus".
+Contournement : lancer les commandes une par une.
+Recommandation / Action corrective appliquee : lecture directe par for /f usebackq (D1). 0/8 apres.
+Statut : RESOLU PAR AUTO-HEALING
+---
+
+[20261004_030117] [PRIVACY_FILTER] [ERROR] Fuite PII vers les modeles cloud demandes directement
+Impact : openrouter-claude, gpt-4o, claude-sonnet, deepseek quittaient la machine sans masquage
+         (seuls les modeles virtuels localai/smart etaient masques).
+Contournement : n'utiliser que le modele virtuel localai.
+Recommandation / Action corrective appliquee : masquage sur toute route cloud (D5). 0 fuite sur 7 routes.
+Statut : RESOLU PAR AUTO-HEALING
+---
+
+[20261004_030117] [VAULT] [ERROR] seal() pouvait supprimer le clair apres un conteneur tronque
+Impact : perte de donnees (verification en memoire, pas sur le fichier ecrit). Reproduit.
+Contournement : aucun fiable.
+Recommandation / Action corrective appliquee : .part + fsync + relecture disque + dechiffrement (D3).
+Statut : RESOLU PAR AUTO-HEALING
+---
+
+[20261004_030117] [INSTALLER] [ERROR] NameError SANDBOX a toute premiere installation
+Impact : installation a blanc impossible (aucun produit existant a heriter).
+Contournement : creer d'abord un dossier AiTron\ ou LocalAI\.
+Recommandation / Action corrective appliquee : SANDBOX injecte dans le namespace de deploiement (D4).
+Statut : RESOLU PAR AUTO-HEALING
+---
+
+[20261004_030117] [RAG_NUMPY] [WARN] Texte cp1252 : oe et guillemets typographiques corrompus (latin-1 en premier)
+Impact : ligatures et euro illisibles dans l'index. Corrige (D2).
+Statut : RESOLU PAR AUTO-HEALING
+---
+
+[20261004_030117] [CLI_ENCODING] [WARN] BOM UTF-8 ecrit par 3 scripts PowerShell (hardware-profile.json, active.json, keys.env)
+Impact : parsing JSON strict en echec chez un lecteur externe. Corrige (D11) ; 0 BOM sur 41 fichiers.
+Statut : RESOLU PAR AUTO-HEALING
+---
+
+[20261004_030117] [PROXY_GATEWAY] [WARN] Failover en flux : primaire mort avant le 1er evenement SSE = flux vide, sans bascule
+Impact : le client recevait un flux vide. Corrige (D9, D9b) ; texte recu une seule fois.
+Statut : RESOLU PAR AUTO-HEALING
+---
+
+[20261004_030117] [CLI_I18N] [WARN] Mode EN : libelles francais fixes dans status, profile, vram, hardware, privacy, vault, peer, spec, graph, start, stop
+Impact : interface mixte. Couche de traduction de sortie ajoutee (D6-D8) ; 0 ligne francaise non ambigue.
+Statut : RESOLU PAR AUTO-HEALING
+---
+
+[20261004_030117] [CLI_ENCODING] [WARN] rag-query refusait une requete entre guillemets ; stop.bat tuait l'enveloppe de traduction
+Impact : "unrecognized arguments" ; sortie de start perdue (1 ligne sur ~20). Corriges (D10, D7).
+Statut : RESOLU PAR AUTO-HEALING
+---
+
+[20261004_030117] [GPU_DETECT] [INFO] DirectML absent : repli CPU transparent (comportement attendu, journalise)
+Impact : aucun. 20 entrees dans le crash.log du staging.
+Statut : SANS SOLUTION RESIDUELLE
+---
+
+[20261005_181500] [FALLBACK_DOWNLOAD] [WARN] Les URLs de fallback (transfert.free.fr) servent une page HTML, non le binaire
+Impact : une installation sur une machine vierge, sans binaires locaux (build\out\) ni staging
+         archive (dev\old\test_dynamique\AiTron\), ne peut pas telecharger le coeur. Le garde-fou
+         d'integrite PE "MZ" rejette la page HTML : l'installation echoue proprement (rollback),
+         sans jamais deployer de faux binaire.
+Contournement : les binaires locaux ou le staging archive couvrent ce cas ; la cascade resout alors
+         le coeur sans reseau (comportement valide : 0 processus zombie, 0 port).
+Recommandation : remplacer FALLBACK_LOCAL_AI_URL / FALLBACK_CLOUD_PROXY_URL par des liens binaires
+         directs et renseigner FALLBACK_LOCAL_AI_SHA256 / FALLBACK_CLOUD_PROXY_SHA256.
+Statut : LIMITE DE SOURCE (URLs temporaires du mandat) -- non corrigeable cote installeur ; le
+         comportement du portage reste sur (rejet + rollback).
+
+[20261005_203300] [FALLBACK_DOWNLOAD] [INFO] RESOLU en v3.1.2 : binaires telecharges depuis GitHub Releases (URLs perennes + SHA-256)
+Impact : l'anomalie v3.1.1 (URLs transfert.free.fr renvoyant du HTML) est levee ; plus de dependance a
+         des liens de partage non directs.
+Preuve : telechargement GitHub verifie (HTTP 200, application/octet-stream, magic MZ,
+         SHA-256 0F55C483... / BFCB2804...), installation en racine vierge reussie (87 composants).
+Statut : RESOLU (v3.1.2). Le garde-fou PE "MZ" reste actif (defense en profondeur).

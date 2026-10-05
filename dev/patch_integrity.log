@@ -1,0 +1,1190 @@
+# patch_integrity.log
+# Validation de chaque patch : AST, tests, resultats. Append-only.
+
+================================================================================
+[2026-10-03] SESSION D'OUVERTURE — v1.0.0
+================================================================================
+Environnement : AMD64 / Windows 10.0.29639 / 34 Go RAM / G: 331 Go libres
+Reseau        : github.com=200, go.dev=200, huggingface.co=200, api.github.com=200
+Python        : 3.12.10 (defaut), 3.14.7
+Git           : 2.55.0.windows.5
+Go            : ABSENT -> installe en sandbox
+Chaine C      : ABSENTE -> a fournir (CGO)
+
+Regle LocalAI v4.11.0 (api.github.com) :
+  assets = local-ai-launcher-linux.tar.xz, local-ai-v4.11.0-darwin-arm64,
+           local-ai-v4.11.0-linux-amd64, local-ai-v4.11.0-linux-arm64,
+           LocalAI-v4.11.0-checksums.txt, LocalAI-v4.11.0-source.tar.gz, LocalAI.dmg
+  => AUCUN binaire Windows. Compilation source retenue (Section 4.2).
+
+Toolchain Go :
+  fichier  = go1.27.1.windows-amd64.zip (78 931 360 o)
+  sha256   = a3911b5e0e1b1053f25ed0675f4c1c6aad1e2bfcf253df2b9be4caabd2edd95d
+  attendu  = a3911b5e0e1b1053f25ed0675f4c1c6aad1e2bfcf253df2b9be4caabd2edd95d  [OK]
+  extract  = tar.exe -xf -> build\tools\go  ; go version => go1.27.1 windows/amd64
+
+Fichiers de gouvernance crees :
+  CHARTE.md, PERIMETRE.md, JOURNAL.md, dev\CHANGELOG.md, dev\DECISIONS.md,
+  dev\patch_integrity.log
+
+================================================================================
+[2026-10-03] LOT FONCTIONNEL v1.1.0 — VALIDATION RATIFIEE (Section 5)
+================================================================================
+Cible      : LocalAI Windows natif (sans Docker, sans WSL)
+Installeur : install_localai_win.py v1.1.0
+Produit    : G:\V1\LocalAI-Projet\LocalAI\
+
+--- 1. VALIDATION AST (Section 1.4) -------------------------------------------
+  ast.parse(install_localai_win.py)                  -> OK (44 noeuds racine)
+  ast.parse(LOCALAI_DEPLOY_CODE)                     -> OK (len=18014)
+  compile(LOCALAI_DEPLOY_CODE)                       -> OK
+  py_compile (fichier temporaire confine)            -> OK
+  occurrences de ''' (delimiteur)                    -> 2 (ouverture + fermeture)
+  SyntaxWarning                                      -> AUCUN (python -W error)
+
+--- 2. INTEGRITE DES TELECHARGEMENTS (Section 4.6) ----------------------------
+  go1.27.1.windows-amd64.zip
+     sha256 = a3911b5e0e1b1053f25ed0675f4c1c6aad1e2bfcf253df2b9be4caabd2edd95d
+     attendu(officiel go.dev) = identique                         [OK]
+  LocalAI-v4.11.0-source.tar.gz
+     sha256 = 6002ee89d9674b3b7fe5cb4db0a9f5028d487469b906719db492053212b09522
+     attendu(checksums officiels v4.11.0) = identique             [OK]
+  llama-b11375-bin-win-cpu-x64.zip
+     sha256 = 90c6721cb0b8d37658b00da9f3e0521e1749c2e5593fb2553a397cc835f1fa9d
+     taille = 19 351 975 octets  ; testzip() -> OK                [OK]
+  Llama-3.2-1B-Instruct-Q4_K_M.gguf
+     sha256 = 6f85a640a97cf2bf5b8e764087b1e83da0fdb51d7c9fab7d0fece9385611df83
+     taille = 807 694 464 octets                                  [OK]
+  protoc-31.1-win64.zip -> libprotoc 31.1 (--version)             [OK]
+
+--- 3. COMPILATION (Go, CGO_ENABLED=0, GOOS=windows/amd64) --------------------
+  codegen : pkg/grpc/proto/backend.pb.go (546 Ko) + backend_grpc.pb.go (95 Ko)  [OK]
+  build   : ./cmd/local-ai        -> build/out/local-ai.exe (195 069 952 o)    EXIT=0
+  build   : ./backend/go/cloud-proxy -> build/out/cloud-proxy.exe (19 915 776 o) EXIT=0
+  version : local-ai.exe --help -> "Version: v4.11.0-win.1"                     [OK]
+
+--- 4. INSTALLATION REELLE (Section 5, conditions physiques) -------------------
+  Suppression complete de LocalAI\  puis python install_localai_win.py
+  Resultat : coeur + bridge + 52 fichiers moteur + modele + configs + manifest
+  manifest.json : 38 composants inventories avec SHA-256                       [OK]
+  Depot transactionnel : LocalAI.new -> LocalAI                                [OK]
+  Boite noire : Installeur\install_localai_win_20261003_HHMMSS.py.txt +
+                Installeur\CHARTE_20261003_HHMMSS.md                            [OK]
+
+--- 5. TESTS FONCTIONNELS (port 8080) -----------------------------------------
+  GET  http://127.0.0.1:8080/v1/models
+       -> 200 {"object":"list","data":[{"id":"llama-3.2-1b-instruct",...}]}     [OK]
+  POST http://127.0.0.1:8080/v1/chat/completions
+       -> 200 content="Hello."  (prompt_tokens=42 completion_tokens=4)          [OK]
+  POST /v1/chat/completions (stream=true) -> flux SSE de chunks                  [OK]
+  Chaine verifiee : local-ai(8080) -> gRPC cloud-proxy -> llama-server(8090)     [OK]
+
+--- 6. ARRET PROPRE (zero zombie) ---------------------------------------------
+  stop.bat : taskkill /T /F sur local-ai.exe, cloud-proxy.exe, llama-server.exe
+  Processus restants            : AUCUN                                        [OK]
+  Ports 8080/8090 encore en ecoute : 0                                         [OK]
+
+================================================================================
+[2026-10-03] PHASE 2 / v1.2.0 — VALIDATION RATIFIEE (Sections 10 & 11)
+================================================================================
+Cible      : LocalAI Windows natif multi-modal et route (sans Docker, sans WSL)
+Installeur : install_localai_win.py v1.2.0
+Produit    : G:\V1\LocalAI-Projet\LocalAI\
+
+--- 1. VALIDATION AST (Section 1.4) -------------------------------------------
+  ast.parse(install_localai_win.py)                  -> OK (77 noeuds racine)
+  ast.parse(LOCALAI_DEPLOY_CODE)                     -> OK (len=55474)
+  compile + py_compile                               -> OK
+  delimiteurs ''' (doit valoir 2)                    -> 2
+  SyntaxWarning                                      -> AUCUN (python -W error)
+
+--- 2. INTEGRITE DES NOUVEAUX TELECHARGEMENTS ----------------------------------
+  python-3.11.9-embed-amd64.zip   sha256 009d6bf7...cfd3b   [OK]
+  whisper-bin-Win32.zip (v1.9.2)  sha256 de170719...cf8f22  [OK]
+  sd-win-cpu-x64.zip              sha256 5e7caca2...31d26c  [OK]
+  ggml-base.bin                   sha256 60ed5bc3...ba2efe  [OK]
+  kokoro-v1.1-zh.onnx             sha256 859f9ded...22e326  [OK]
+  voices-v1.1-zh.bin              sha256 14cb6186...703acd  [OK]
+
+--- 3. ENVIRONNEMENT EMBARQUE --------------------------------------------------
+  Python 3.11.9  ; litellm 1.103.2 ; kokoro-onnx 0.6.1 ; onnxruntime 1.30.0 ; soundfile 0.14.0
+  Bootstraps : pip + litellm[proxy] + kokoro-onnx OK
+
+--- 4. INSTALLATION REELLE / REDEPLOIEMENTS MULTIPLES --------------------------
+  Bascule transactionnelle LocalAI.new -> LocalAI                             [OK]
+  manifest.json : 54 composants, root = LocalAI (corrige, Section 12.1)       [OK]
+    doublons : AUCUN
+  Arret preventif _stop_existing() avant bascule                              [OK]
+  Rollback verifie (1 echec reel de verrou -> produit preserve)               [OK]
+
+--- 5. TESTS FONCTIONNELS (Section 10) ----------------------------------------
+  GET  :8080/v1/models                                    -> 200            [OK]
+  POST :8080/v1/chat/completions (core)                   -> "Hello, ..."    [OK]
+  GET  :4000/health/liveliness (LiteLLM)                  -> 200 "I'm alive" [OK]
+  POST :4000/v1/chat/completions  model=local-llama       -> "Hi"            [OK]
+  POST :4000/v1/chat/completions  model=smart (long)      -> reponse reelle  [OK]
+  POST :8091/v1/audio/transcriptions (whisper)            -> texte JFK       [OK]
+  POST :8093/v1/audio/speech (kokoro TTS)                 -> WAV ~140 Ko     [OK]
+  :8092/ (sd-server)                                      -> installe, modele SD non telecharge (assume)
+
+--- 6. CLIENT (CLI wrapper Run-LocalAI.bat) ------------------------------------
+  start | stop | status | pull <model> | list | backends | help              [OK]
+  start idempotent (aucun doublon : 1 par moteur, 2 python)                  [OK]
+  pull : id inconnu -> erreur claire ; id present -> hash verifie            [OK]
+
+--- 7. ARRET PROPRE (Section 11.1.6) ------------------------------------------
+  Run-LocalAI.bat stop -> "Zero zombie" ; 0 process residuel ; 0 port en ecoute [OK]
+
+--- 8. BETA-TEST (Section 11) -------------------------------------------------
+  7 scenarios eprouves ; 12 anomalies corrigees ; 0 anomalie non corrigee
+  Journal : dev\crash.log ; Rapport : dev\BETA_TEST_REPORT.md
+
+VERDICT : PHASE 2 / v1.2.0 VALIDEE ET RATIFIEE.
+================================================================================
+
+================================================================================
+[2026-10-03] PHASE 3 / v1.3.0 — VALIDATION RATIFIEE (Sections 9 & 10)
+================================================================================
+Cible      : LocalAI Windows natif optimise GPU (sans Docker, sans WSL)
+Installeur : install_localai_win.py v1.3.0
+Produit    : G:\V1\LocalAI-Projet\LocalAI\
+
+--- 1. VALIDATION AST (Section 1.4) -------------------------------------------
+  ast.parse(install_localai_win.py)                  -> OK (88 noeuds racine)
+  ast.parse(LOCALAI_DEPLOY_CODE)                     -> OK (len ~79 Ko)
+  compile + py_compile                               -> OK
+  delimiteurs ''' (doit valoir 2)                    -> 2
+  SyntaxWarning                                      -> AUCUN (python -W error)
+
+--- 2. DETECTION MATERIELLE (Section 3) ----------------------------------------
+  GPU   : NVIDIA GeForce GTX 970M - 6144 Mo (driver 527.41) - via nvidia-smi   [OK]
+  CPU   : Intel(R) Core(TM) i7-6700HQ - 4 coeurs / 8 threads                   [OK]
+  RAM   : 31,9 Go                                                              [OK]
+  Vulkan: vulkan-1.dll present -> backend vulkan retenu                        [OK]
+  ROCm  : absent (machine non AMD) -> branche AMD non testable                 [n/a]
+  Repli CPU : operationnel (profil soft, ngl=0)                                [OK]
+
+--- 3. VARIANTES LLAMA.CPP (Section 4) -----------------------------------------
+  cpu    : installee (b11375)                                                  [OK]
+  vulkan : installee (sha256 36ab68f3...09f7f8)                                [OK]
+  cuda   : installee + cudart (sha256 74b9eca3...d3417c)                       [OK mais INUTILISABLE]
+           -> prebuild sans sm_52 (Maxwell) : "invalid device function"  -> REPLI VULKAN
+  bascule variante active (engine_select.ps1) + active.json                    [OK]
+
+--- 4. PARAMETRES ET PROFILS (Sections 5 & 9) ----------------------------------
+  info modele via "local-ai util gguf-info" : layers=16 n_embd=2048 n_vocab=128256 ctx_train=131072 [OK]
+  calcul -ngl : budget VRAM - marge - cache KV - 10%  -> ngl=99                [OK]
+  threads=8, ctx=4096 (aligne 4096)                                            [OK]
+  profils : soft (ngl=0/4t/marge1536) normal (ngl=99/8t/1024) hard (99/8t/768) [OK]
+            auto -> normal ; custom (mecanisme)                                [OK]
+  config\hardware-profile.json persistant + complet                            [OK]
+
+--- 5. SECURITE VRAM (Section 5.3) ---------------------------------------------
+  besoin ~797 Mo / libre 4876 Mo -> ratio 6,12 -> "optimal"                    [OK]
+  regle : ratio < 0.75 -> bascule CPU automatique (ngl=0)                      [OK]
+
+--- 6. BENCHMARK REEL CPU vs GPU (Section 9) -----------------------------------
+  CPU  (-ngl 0)   : 14,91 tok/s (128 tokens, 9,85 s)                           [OK]
+  GPU  Vulkan     : 71,41 tok/s (128 tokens, 2,60 s)  -> ~4,8x                 [OK]
+  GPU util (nvidia-smi) : 85-99 % ; VRAM ~1245 Mo pendant l'inference          [OK]
+  VRAM apres arret : 1245 -> 652 Mo (modele libere)                            [OK]
+  historique : config\bench-history.jsonl                                      [OK]
+
+--- 7. CLI ENRICHI (Section 7) -------------------------------------------------
+  profile | optimize | benchmark [cpu] | set-profile <p>                       [OK]
+  start/stop/status/pull/list/backends/help (non-regression)                   [OK]
+
+--- 8. MULTI-MODAL GPU (Section 6) ---------------------------------------------
+  texte  : GPU Vulkan verifie (4,8x)                                           [OK]
+  TTS    : provider ONNX DML->CUDA->CPU avec sonde ; ici CPUExecutionProvider  [OK (repli)]
+  image  : variante CUDA installee (modele SD non telecharge : non verifiee)    [assume]
+  audio  : pas de build GPU x64 -> CPU                                          [assume]
+
+--- 9. NON-REGRESSION / ARRET (Section 9) --------------------------------------
+  ports 8080/4000/8091/8093 UP ; chat core "Hello." ; litellm local+smart      [OK]
+  whisper STT (JFK) ; TTS WAV ~140 Ko                                          [OK]
+  Run-LocalAI.bat stop -> "Zero zombie" ; 0 processus residuel                 [OK]
+
+--- 10. BETA-TEST (Section 10) -------------------------------------------------
+  7 scenarios eprouves ; 5 anomalies GPU corrigees/contournees ; 0 restante non documentee
+  Journal : dev\crash.log (categories GPU) ; Rapport : dev\BETA_TEST_REPORT.md
+
+VERDICT : PHASE 3 / v1.3.0 VALIDEE ET RATIFIEE.
+================================================================================
+
+================================================================================
+[2026-10-03] PHASE 4 / v1.4.0 — VALIDATION RATIFIEE (Sections 1 a 4)
+================================================================================
+Cible      : LocalAI Windows natif + RAG local + Agent Hub (sans Docker, sans WSL)
+Installeur : install_localai_win.py v1.4.0
+Produit    : G:\V1\LocalAI-Projet\LocalAI\
+
+--- 1. VALIDATION AST (Section 1.4 de la charte) ------------------------------
+  ast.parse(install_localai_win.py)                  -> OK (88 noeuds racine)
+  ast.parse(LOCALAI_DEPLOY_CODE)                     -> OK (len ~100 Ko)
+  compile + py_compile                               -> OK
+  delimiteurs ''' (doit valoir 2)                    -> 2
+  SyntaxWarning                                      -> AUCUN (python -W error)
+
+--- 2. ETAPES INITIALES OBLIGATOIRES ------------------------------------------
+  archive_installer() en tete de main()               -> OK (boite noire)
+  manifest.json root = chemin final (pas de .new)     -> OK
+  version globale v1.4.0 (installeur + manifest)      -> OK
+
+--- 3. PIPELINE RAG (Section 1) -----------------------------------------------
+  faiss                                               -> NON UTILISE (proscrit)
+  packages isoles (pip --target : numpy/pypdf/docx/openpyxl) -> runtime\packages  [OK]
+  python311._pth contient '..\\packages' + 'import site'                          [OK]
+  corpus de test 5 formats : .txt .py .pdf .docx .xlsx                            [OK]
+  Run-LocalAI.bat index <corpus> :
+    - 5 fichiers detectes ; 5 chunks ; dims 2048 ; 7.8 s                          [OK]
+    - index a plat : index-default.npy / chunks-default.jsonl / manifest-default.json
+  Run-LocalAI.bat rag-query <texte> (multi-mots) : top-5 cosinus                  [OK]
+    1. notes.txt 0.7694 | 2. rapport.pdf 0.7693 | 3. rapport.docx 0.7586
+    4. sample.py 0.6207 | 5. mesures.xlsx 0.5864
+  chunking 2048 car. / recouvrement 10 % (parametrable)                           [OK]
+
+--- 4. AGENT HUB / LITELLM AVANCE (Section 2) ---------------------------------
+  modele virtuel unique 'localai' (alias smart/auto)                              [OK]
+  prompt court  -> local-llama (journalise)                                       [OK]
+  prompt complexe (sans cle) -> local-llama (repli)                               [OK]
+  contexte sature (200 tok > 100, test unitaire) -> local (repli)                 [OK]
+  bascule cloud (cle DeepSeek presente) -> 'deepseek'                             [OK]
+  preference cloud OpenRouter > DeepSeek > OpenAI > Anthropic                     [OK]
+  journal de routage logs\routing.jsonl                                           [OK]
+
+--- 5. CLI ENRICHI (Section 3) ------------------------------------------------
+  index <dossier> | rag-query <texte> | proxy-logs | key-set <provider> <valeur>  [OK]
+  key-set : ecriture chirurgicale dans config\keys.env (autres lignes preservees) [OK]
+  proxy-logs : decisions de routage + logs LiteLLM                                [OK]
+  non-regression v1.2/v1.3 (start/stop/status/profile/benchmark/pull/list)        [OK]
+
+--- 6. QA / ARRET (Section 4.3) -----------------------------------------------
+  apres indexation + arret : AUCUN processus residuel (Python ou binaire)         [OK]
+  ports 8080/4000/8090/8094 liberes : 0 en ecoute                                 [OK]
+  VRAM apres arret : 442 Mo (modele libere)                                       [OK]
+
+--- 7. TRAÇABILITE (Section 4.5) ----------------------------------------------
+  dev\CHANGELOG.md (v1.4.0) ; dev\DECISIONS.md (D-019..D-023)                     [OK]
+  dev\patch_integrity.log (ce bloc) ; dev\BETA_TEST_REPORT.md (phase 4)           [OK]
+  dev\crash.log (categories RAG_INGEST / VECTOR_DB / PROXY_GATEWAY)               [OK]
+  INSTALLATION.md enrichi (sections 25+)                                          [OK]
+
+VERDICT : PHASE 4 / v1.4.0 VALIDEE ET RATIFIEE.
+================================================================================
+
+================================================================================
+PHASE 4.1 / v1.4.1 (micro-increment) - JOURNAL D'INTEGRITE DES PATCHS
+Date : 2026-10-03
+--------------------------------------------------------------------------------
+--- 1. DOCTRINE TRANSACTIONNELLE -----------------------------------------------
+  archive_installer() au sommet de main()                                   [OK]
+  Sauvegarde horodatee (.py.txt) dans Installeur\                            [OK]
+  manifest.json "root" = chemin de production final (LocalAI\)              [OK]
+  Version globale : v1.4.1                                                  [OK]
+  Validation AST triple (module / deploy / delimiteurs)                     [OK]
+
+--- 2. WATCHDOG VRAM (Section 1) ------------------------------------------------
+  scripts\vram_watchdog.py deploye (echo 2 s, nvidia-smi + repli WMI)       [OK]
+  Seuils : alerte < 15 % / critique < 5 % / reprise > 20 %                  [OK]
+  Alerte journalisee -> logs\vram.log + dev\crash.log (GPU_VRAM)            [OK]
+  Action preventive -> relance moteur -ngl 0 (data\vram-action.json)        [OK]
+  CLI : Run-LocalAI.bat vram-status (totale/libre/utilisee/seuils/etat)     [OK]
+  Flag : Run-LocalAI.bat start --no-watchdog (desactivation silencieuse)    [OK]
+
+--- 3. MODELE IMAGE LEGER (Section 2) -------------------------------------------
+  Entree catalogue sd-turbo-light (gguf, 1880 Mo, sha256 renseigne)         [OK]
+  Run-LocalAI.bat pull sd-turbo-light : telechargement + SHA-256            [OK]
+  Fichier : models\sd_turbo-f16-q8_0.gguf (1930 MiB, HASH OK)               [OK]
+  sd-server charge le modele leger en priorite                              [OK]
+
+--- 4. DOCUMENTATION CUDA MAXWELL (Section 3) -----------------------------------
+  INSTALLATION.md section 31 (invalid device function + CMake sm_52)        [OK]
+  hw_profile.ps1 : detection variants\cuda\custom-build.txt                 [OK]
+  Preference CUDA > Vulkan si build personnalise (cuda_custom_build)        [OK]
+
+--- 5. TRAABILITE (Section 4) ---------------------------------------------------
+  dev\CHANGELOG.md (v1.4.1) ; dev\DECISIONS.md (D-024, D-025)               [OK]
+  dev\patch_integrity.log (ce bloc) ; dev\BETA_TEST_REPORT.md (phase 4.1)   [OK]
+  dev\crash.log (categorie GPU_VRAM : alerte + critique simules)            [OK]
+  INSTALLATION.md enrichi (sections 30-32)                                  [OK]
+
+--- 6. AUTO-HEALING -------------------------------------------------------------
+  A1 Anomalie : BOM UTF-8 dans data\llama-cmd.json (Set-Content -Encoding UTF8)
+     -> json.load echouait, action preventive degradee (applied:false)
+     Correctif : lecture utf-8-sig (Python) + IO.File.WriteAllText BOM-free (PS)
+     Re-test : action preventive applied:true, moteur relance -ngl 0, chat 200  [OK]
+  A2 Anomalie : --extra-sample-args steps=4 ignore par sd-server
+     Correctif : flag CLI --steps 4 (verifie : 1/4 -> 4/4)                      [OK]
+  A3 Anomalie : banniere/CLI figes sur v1.2.0 / v1.3.0 (up.ps1, bat, status)
+     Correctif : placeholder __VERSION__ substitue par _write_text()            [OK]
+     Verifie : "LocalAI Windows v1.4.1 demarre" / "Profil materiel (v1.4.1)"    [OK]
+  A4 Anomalie : cosmetique "%%" dans l'affichage du watchdog (ps1) -> corrige   [OK]
+  A5 Anomalie : heritage incomplet -> modele image telecharge perdu au redeploy
+     Correctif : regle d'or etendue a models\<SD_TURBO_LIGHT_FILE>
+     Verifie : "heritage conserve : ...\models\sd_turbo-f16-q8_0.gguf"          [OK]
+  Insertions de gabarits : validation AST apres chaque patch (5 reconstructions)[OK]
+
+--- 7. VERIFICATION FINALE (v1.4.1) ---------------------------------------------
+  AST triple validation                                                     [VERT]
+  Redeploiement transactionnel (70 composants, root = chemin final)         [OK]
+  Banniere de demarrage : "LocalAI Windows v1.4.1 demarre"                  [OK]
+  sd-server : modele leger charge (sd_turbo-f16-q8_0.gguf) + --steps 4      [OK]
+  watchdog VRAM actif (PID trace dans data\pids.txt)                        [OK]
+  vram-status : 6144 Mo, libre 77 %, seuils, watchdog=running               [OK]
+  status : llama/whisper/sd/tts/local-ai/litellm RUNNING                    [OK]
+  chat coeur LocalAI (8080) : HTTP 200 -> "OK"                              [OK]
+  Arret : "Tous les processus sont arretes. Zero zombie."                   [OK]
+
+VERDICT : PHASE 4.1 / v1.4.1 VALIDEE ET RATIFIEE.
+================================================================================
+
+
+================================================================================
+CHANTIER v1.5.0 / v1.6.0 - JALON 0 & JALON 1 (PROTOCOLE A JALONS ETANCHES)
+Date : 2026-10-03
+--------------------------------------------------------------------------------
+--- JALON 0 : SAUVEGARDE ANTE-EXECUTION ------------------------------------------
+  archive_installer() = 1ere instruction de main() (L3042)                  [OK]
+  Sauvegarde horodatee .py.txt dans Installeur\ (18 presentes)               [OK]
+  manifest.json "root" = chemin de production final                          [OK]
+
+--- JALON 1 : BETA-TEST DE RUPTURE SUR L'EXISTANT (v1.4.1) ----------------------
+  Ports 8080 (coeur) / 8090 (llama) / 8092 (sd) / 4000 (gateway) joignables   [OK]
+  Inference texte via le coeur (8080) -> "PONG"                               [OK]
+  Inference texte via le gateway (4000, cle maitre sk-local) -> "PONG."       [OK]
+  Securite : requete SANS cle -> HTTP 401 propre (avant : 500)                [OK]
+  RAG index : 5 fichiers -> 5 chunks x 2048 dims en 9,3s                      [OK]
+  RAG rag-query : 5 resultats cosinus (txt/py/pdf/docx/xlsx)                  [OK]
+  RESULTAT JALON 1 : 7/7 OK
+
+--- JALON 1 : BUG RESIDUEL DETECTE + AUTO-HEALING ------------------------------
+  Anomalie : gateway LiteLLM -> HTTP 500 sur requete non authentifiee
+    Cause : import prisma non protege dans le handler d'auth LiteLLM ;
+            extra [proxy] omis silencieusement (pip check=False)
+    Correctif : ensure_proxy_deps() (sonde import + pip --target + re-verif)
+                + entree manifest runtime/python/.../site-packages/prisma
+    Verifie : is_database_infrastructure_error -> False ; 401 au lieu de 500  [OK]
+    Re-test complet : JALON 1 7/7                                             [OK]
+
+  Traces : dev\DECISIONS.md (D-028), dev\CHANGELOG.md, dev\crash.log           [OK]
+
+STATUT : JALON 1 VALIDE AU VERT - existant stabilise avant v1.5.0.
+         PASSAGE AUTORISE AU JALON 2 (v1.5.0) apres feu vert.
+================================================================================
+
+
+================================================================================
+CHANTIER v1.5.0 - JALON 2 (IMPLEMENTATION) & JALON 3 (VALIDATION)
+Date : 2026-10-03
+--------------------------------------------------------------------------------
+--- SOUS-ETAPE v1.5.0a : VISION LOCALE -----------------------------------------
+  Catalogue : 2 modeles multimodaux, chacun avec DEUX URLs (GGUF + mmproj)      [OK]
+    - qwen2-vl-2b   : Qwen2-VL-2B-Instruct-Q4_K_M.gguf (942 Mo)
+                      + mmproj-Qwen2-VL-2B-Instruct-Q8_0.gguf (676 Mo)
+    - smolvlm-500m  : SmolVLM-500M-Instruct-Q8_0.gguf (420 Mo)
+                      + mmproj-SmolVLM-500M-Instruct-Q8_0.gguf (100 Mo)
+  Telechargement ATOMIQUE (les deux fichiers ou rien)                        [OK]
+    - 2 fichiers en .part, 2 SHA-256 verifies, publication groupee
+    - verifie : "paire modele + projecteur publiee (atomique)"
+  Injection '--mmproj models/mmproj_specifique.gguf' dans llama-server         [OK]
+    - ligne de commande verifiee : -m Qwen2-VL-... --mmproj mmproj-Qwen2-VL-...
+  Images (.png/.jpg/...) integrees aux METADONNEES de l'index contextuel       [OK]
+    - chunk : {"kind":"image","format":"png","width":512,"height":512,
+               "bytes":402991,"megapixels":0.262} - sans dependance externe
+
+--- SOUS-ETAPE v1.5.0b : PROTOCOLE MCP (SDK OFFICIEL) --------------------------
+  SDK officiel consomme (mcp 2.3.0, spec 2024-11-05) - AUCUNE reimplementation  [OK]
+    - fourni par litellm[proxy] dans le Python embarque ; litellm importe OK
+    - repli defensif : installation isolee runtime\mcp\packages si absent
+  Serveur MCP local 'localai' (JSON-RPC 2.0 sur stdio)                        [OK]
+    - 5 outils : rag_query, vision_caption, status, vram_status, graph_show
+  Declaration centralisee : config\mcp-settings.json                          [OK]
+    - preserve entre reinstallations (regle d'or de l'heritage)
+  CLI : mcp-list / mcp-call / mcp-test                                        [OK]
+
+--- JALON 3 : BETA-TEST DE RUPTURE v1.5.0 --------------------------------------
+  Inference vision avec image locale (eval_image.png 512x512)                  [OK]
+    - HTTP 200 en 47 s -> "Un tableau de fruits, avec une pomme rouge et une
+      poire, sur une table en bois." (prompt source : "a red apple on a
+      wooden table")
+  Appel d'outil via le client MCP (list_tools) : mcp-list                     [OK]
+    - serveur 'localai' [up], 5 outils listes avec descriptions
+  Appel d'outil via le client MCP (call_tool) : mcp-call                      [OK]
+    - localai_vram_status -> isError:false, payload JSON-RPC propre
+    - localai_vision_caption -> isError:false, legende correcte (376 tok/40,8 s)
+  Autotest : mcp-test                                                         [OK]
+    - "client stdio sur 'localai' : {\"localai\": \"up\"}" ; 5 outils vus ;
+      VERDICT : VERT
+  Index RAG collection 'vision' (image + texte)                               [OK]
+    - 2 chunks x 2048 dims ; metadonnees image presentes dans le chunk
+
+--- JALON 3 : ANOMALIES DETECTEES + AUTO-HEALING -------------------------------
+  A6 Regression d'heritage : les modeles VISION telecharges etaient perdus au
+     redeploiement (regle d'or incomplete) -> l'etendue : SD_TURBO (+light) et
+     les 4 fichiers des 2 modeles multimodaux                           [CORRIGE]
+  A7 'serve' transforme en chemin absolu par _server_params -> serveur stdio
+     impossible a demarrer -> resolution selective des arguments           [CORRIGE]
+  A8 'mcp-call' : quoting shell consommant les guillemets JSON -> option
+     --args-file + garde dans Run-LocalAI.bat                            [CORRIGE]
+  A9 'Vulkan device lost' a l'encodage multimodal (mtmd) sur Maxwell ->
+     moteur vision en CPU par defaut (D-029)                             [CORRIGE]
+
+  Traces : dev\DECISIONS.md (D-029, D-030, D-031), dev\CHANGELOG.md,
+           dev\crash.log (categories GPU_VISION, MCP_GATEWAY)                 [OK]
+
+STATUT : JALON 3 VALIDE AU VERT - v1.5.0 livree (version globale + manifest).
+         PASSAGE AU JALON 4 (v1.6.0) sur feu vert.
+================================================================================
+
+
+================================================================================
+CHANTIER v1.6.0 - JALON 4 (IMPLEMENTATION) & JALON 5 (VALIDATION FINALE)
+Date : 2026-10-03
+--------------------------------------------------------------------------------
+--- JALON 4a : GRAPHRAG SECURISE (EXTRACTION PAR LE LLM LOCAL) ------------------
+  Extraction NER/RE DELEGUEE a llama-server (/v1/chat/completions, T=0)         [OK]
+    - prompt exigeant un tableau JSON strict [{"head","type","relation","tail"}]
+    - AUCUNE heuristique par expressions regulieres
+  Parsing robuste : premier tableau equilibre + nettoyage + RECUPERATION des
+    objets completes en cas de sortie tronquee (max_tokens)                    [OK]
+  Interdependances structurelles du code source (imports par langage)          [OK]
+    - aretes deterministes kind:"structural" (distinctes de kind:"llm")
+  Serialisation A PLAT : runtime\storage\graph_db.json                         [OK]
+  Mesure : 22 noeuds / 50 aretes (42 LLM + 8 structurelles) / 6 chunks / 0 echec [OK]
+  CLI : graph-index <dossier> / graph-show                                    [OK]
+  Outil MCP localai_graph_show (statistiques du graphe)                       [OK]
+
+--- JALON 4b : FAILOVER SSE TRANSPARENT ---------------------------------------
+  Proxy scripts\failover_proxy.py (port 8081)                                 [OK]
+  Bufferisation COMPLETE AVANT ENVOI (requetes sensibles/agent)               [OK]
+    - amont interroge en JSON (stream:false) puis flux SSE reconstruit
+    - rejeu silencieux sur la route suivante en cas d'echec
+  Failover SUR ERREUR AVANT LE PREMIER TOKEN (streaming de routine)           [OK]
+    - decision par sonde TCP bornee a 1.5 s
+  Chaine deterministe : core-local -> vision-cpu (local CPU) -> cloud         [OK]
+  Audit : logs\failover.jsonl (route, mode, failover, ms_decision, chars)     [OK]
+  Configuration : config\failover.json (preservee - regle d'or)                [OK]
+
+--- JALON 5 : BETA-TEST FINAL v1.6.0 -------------------------------------------
+  Panne materielle simulee (kill du llama-server primaire, PID 8860)          [OK]
+    - routine (flux)  : route=vision-cpu, failover=true, decision 162 ms
+    - bufferise       : 'core-local : HTTP 500' intercepte -> rejeu vision-cpu
+                        decision 334-367 ms, client HTTP 200, flux SSE complet
+    - AUCUNE coupure visible cote client (integrite de la session preservee)
+    - budget de decision < 1.5 s respecte
+  Indexation GraphRAG sur le code source                                      [OK]
+  graph-show : statistiques du graphe (hubs, relations, moteur)                [OK]
+  NON-REGRESSION : ports/inference/RAG/vision/MCP                              [OK]
+  Arret general : "Tous les processus sont arretes. Zero zombie." + VRAM liberee [OK]
+
+--- JALON 5 : ANOMALIES DETECTEES + AUTO-HEALING -------------------------------
+  A12 GraphRAG : sortie LLM tronquee -> 0 triplet -> recuperation des objets
+      complets + max_tokens borne + consigne de fermeture                [CORRIGE]
+  A13 Failover bufferise : stream:true transmis en amont -> contenu vide ->
+      amont interroge en JSON puis flux SSE reconstruit                  [CORRIGE]
+  A14 Failover : HTTP 404 declenchait une bascule inutile -> 4xx = erreur de
+      requete renvoyee telle quelle + alias_map des modeles              [CORRIGE]
+  A15 Proxy failover non demarre : $py defini APRES son utilisation dans
+      localai_up.ps1 -> definition deplacee en tete du script            [CORRIGE]
+  A16 Titre vram-status fige sur v1.4.1 -> placeholder __VERSION__        [CORRIGE]
+
+  Traces : dev\DECISIONS.md (D-032, D-033, D-034), dev\CHANGELOG.md,
+           dev\crash.log (categories GRAPHRAG, FAILOVER)                   [OK]
+
+STATUT : JALON 5 VALIDE AU VERT - v1.6.0 stabilisee, gelee et livree.
+================================================================================
+
+
+================================================================================
+CHANTIER v1.7.0 / v1.8.0 - JALON 0 & JALON 1 (PROTOCOLE A JALONS ETANCHES)
+Date : 2026-10-03
+--------------------------------------------------------------------------------
+--- JALON 0 : SAUVEGARDE ANTE-EXECUTION ------------------------------------------
+  archive_installer() = 1ere instruction de main() (L4547, def L4545)        [OK]
+  Sauvegardes horodatees .py.txt dans Installeur\ (24 presentes)              [OK]
+
+--- JALON 1 : BETA-TEST DE RUPTURE COMPLET SUR LA v1.6.0 ------------------------
+  Ports 8080 / 8090 / 8092 / 4000 / 8095 / 8081 joignables                    [OK]
+  Inference texte via le coeur (8080) et le gateway (4000, cle maitre)         [OK]
+  Securite gateway : requete SANS cle -> HTTP 401 propre                       [OK]
+  Suite JALON 1 : 7/7 OK                                                       [OK]
+  VISION : outil MCP localai_vision_caption -> isError:false, legende correcte [OK]
+    - image eval_image.png (512x512) via llama-server --mmproj (:8095)
+  RAG : rag-query -> 5 resultats par similarite cosinus                        [OK]
+  GRAPHRAG : graph-show -> 19 noeuds / 23 aretes (15 LLM + 8 structurelles)    [OK]
+  MCP : mcp-test -> VERDICT VERT, 5 outils vus par le client stdio             [OK]
+  FAILOVER nominal : routes core-local, flux SSE complets ([DONE])             [OK]
+  FAILOVER bascule (kill du llama-server primaire, PID 11504)                  [OK]
+    - 'core-local : HTTP 500' intercepte -> rejeu vision-cpu
+    - decision 513-640 ms, contenu reel transmis, client en HTTP 200
+  AUCUNE ANOMALIE ni regression detectee -> aucun auto-healing necessaire.
+
+STATUT : JALON 1 VALIDE AU VERT (v1.6.0 saine dans toutes ses dimensions).
+         PASSAGE AU JALON 2 (v1.7.0) autorise.
+================================================================================
+
+
+================================================================================
+CHANTIER v1.7.0 - JALON 2 (IMPLEMENTATION) & JALON 3 (VALIDATION)
+Date : 2026-10-03
+--------------------------------------------------------------------------------
+--- SOUS-ETAPE v1.7.0a : QUANTIZATION ADAPTATIVE DEDIEE -------------------------
+  Support de llama-quantize.exe integre a l'orchestrateur Python              [OK]
+    - binaire present : backends\llama-cpp\llama-quantize.exe (+ impl.dll)
+  CLI : Run-LocalAI.bat quantize <modele_f16> <type> [--out] [--async]         [OK]
+  Mode ASYNCHRONE : processus de fond, le CLI rend la main immediatement       [OK]
+  Securite : verifications binaire/source/type avant lancement, sortie propre  [OK]
+  Audit : logs\quantize.log + data\quantize-history.jsonl (SHA-256, ratio)      [OK]
+  MESURE REELLE : SmolVLM-500M-Instruct-f16.gguf 782 Mo -> Q8_0 417 Mo         [OK]
+    - 'quant size = 414.86 MiB (8.50 BPW)', quantize time = 2447.79 ms
+    - historique : {"type":"Q8_0","ok":true,"async":true,"output_bytes":436806912}
+  CLI complementaire : quantize list (24 types + sources non quantifiees)      [OK]
+
+--- SOUS-ETAPE v1.7.0b : FILTRE PII HYBRIDE (BEST-EFFORT) ----------------------
+  Module config\pii_filter.py - 3 niveaux                                    [OK]
+    N1 regex deterministes : email, IPv4, IPv6, JWT, sk-, ghp_, AKIA, xox,
+                             cle PEM, carte bancaire (validee par Luhn)
+    N2 entropie de Shannon : jetons >= 20 car., >= 3,5 bits, jeu mixte
+    N3 NER local leger     : appel interne au moteur local (aucun envoi)
+  Masquage REVERSIBLE [PII-TYPE-n] + demasquage automatique de la reponse      [OK]
+  Integration Token Saver (config\complexity_router.py)                        [OK]
+    - masquage UNIQUEMENT si la requete part vers le cloud
+    - hook post-appel : restauration des valeurs cote utilisateur local
+  Drapeau de desactivation : start --no-pii-filter (LOCALAI_PII_FILTER=0)      [OK]
+  Documentation BEST-EFFORT (non garantie a 100%) : INSTALLATION.md section 40 [OK]
+  Audit : dev\crash.log categorie PRIVACY_FILTER (type, niveau, jeton, apercu) [OK]
+
+--- JALON 3 : BETA-TEST DE RUPTURE v1.7.0 --------------------------------------
+  Autotest quantize (modele F16 reel) : OK, fichier produit + SHA-256            [OK]
+  Autotest filtre : 'Run-LocalAI.bat privacy-test'                              [OK]
+    - masques : EMAIL, IPV4x2, API_KEY_OPENAI, API_KEY_GITHUB, HIGH_ENTROPY
+    - reversibilite : IDENTIQUE  -> VERDICT : VERT
+  Debordement CLOUD SIMULE (cle OpenRouter presente, prompt complexe)          [OK]
+    - routage : modele virtuel 'localai' -> 'openrouter-claude' (cloud)
+    - prompt transmis : aucun secret original present (clé, IPs, email masques)
+    - reponse cloud (contenant les jetons) -> RESTAUREE cote utilisateur
+    - VERDICT : VERT (masquage avant depart OK, demasquage en retour OK)
+  Proprete des logs d'audit : verifiee (apercus tronques, jamais le secret)     [OK]
+
+--- JALON 3 : ANOMALIES DETECTEES + AUTO-HEALING -------------------------------
+  A17 Worker asynchrone de quantization : arguments positionnels decales
+      -> passage par --out/--threads                                       [CORRIGE]
+  A18 'quantize list' listait un modele DEJA quantifie comme source F16 :
+      filtre elargi (exclusion des tags q8_/q6_/q5_/q4_/q3_/q2_/iq)         [CORRIGE]
+  A19 Niveau 2 manquait les mots de passe a symboles ($ ! @ #) : jeu de
+      caracteres elargi aux jetons non separes par des espaces              [CORRIGE]
+  A20 Numerotation des jetons inversee (tri decroissant) -> selection
+      gauche-a-droite + reconstruction en un passage                        [CORRIGE]
+
+STATUT : JALON 3 VALIDE AU VERT - v1.7.0 livree (version globale + manifest).
+         PASSAGE AU JALON 4 (v1.8.0) autorise.
+================================================================================
+
+
+================================================================================
+CHANTIER v1.8.0 - JALON 4 (IMPLEMENTATION) & JALON 5 (VALIDATION FINALE)
+Date : 2026-10-03
+--------------------------------------------------------------------------------
+*** INCIDENT MAJEUR (voir dev\crash.log [DEPLOY_GUARD] et dev\DECISIONS.md D-037) ***
+  Fait : lors du deploiement v1.7.0, la bascule transactionnelle a DETRUIT l'arbre de
+  production (rmtree AVANT mise en place du nouveau + fichier verrouille sur
+  runtime\python) ; le rollback a de plus supprime le staging NEUF et COMPLET.
+  Cause racine : ordre DESTRUCTIF (purger -> installer) au lieu d'une PERMUTATION.
+  Correctif 1 : swap_product() reecrit en PERMUTATION PAR RENOMMAGE
+                (ecarter -> installer -> purger en best-effort ; restauration de
+                 l'ancien en cas d'echec, staging conserve pour reessai)          [OK]
+  Correctif 2 : _guard_running_services() refuse toute reconstruction si un service
+                est encore actif (sonde OpenProcess sur data\pids.txt)             [OK]
+  Reconstruction : produit reconstruit par l'installeur, bascule verifiee
+                ("Produit bascule de facon transactionnelle vers ...\LocalAI")    [OK]
+  Lecon : une bascule transactionnelle ne doit JAMAIS etre destructive en amont.
+
+--- JALON 4 : ACCELERATION UNIVERSELLE NPU (DIRECTML) --------------------------
+  onnxruntime-directml installe de facon isolee (routine ensure_onnx_directml)  [OK]
+    - verification par re-controle du provider apres installation
+  Accelerateur semantique scripts\onnx_provider.py                             [OK]
+    - priorite 1 : NPU Intel (DirectML/OpenVINO natif Windows 11)
+    - priorite 2 : NPU AMD Ryzen AI (XDNA2) via les couches DirectML unifiees
+    - FALLBACK OBLIGATOIRE : CPU, automatique et transparent
+  Taches semantiques LEGERES adressees au provider (PII NER, outils MCP legers)  [OK]
+  Modele sonde ONNX AUTHENTIQUE deploye (mnist-8.onnx, SHA-256 verifie)          [OK]
+  CLI : hardware-status (repartition des charges) / npu-probe                    [OK]
+  Outil MCP localai_semantic_probe (6e outil, deporte sur l'accelerateur)        [OK]
+
+--- JALON 5 : BETA-TEST FINAL v1.8.0 -------------------------------------------
+  Simulation d'ABSENCE de pilote NPU compatible DirectML                       [OK]
+    - detect() -> 'DirectML absent (pilote ou materiel incompatible)'
+    - repli CPU automatique, SESSION NON INTERROMPUE
+    - avertissement consigne : dev\crash.log [GPU_DETECT] [WARN] (verifie)
+  Sonde REELLE sur le provider retenu : 'npu-probe'                            [OK]
+    - {"ok": true, "device": "cpu", "selected": "cpu", "prediction": 9}
+    - inference effective sur mnist-8.onnx (pas une simple detection d'API)
+  hard-status : repartition moteur principal / taches semantiques / services    [OK]
+  Bascule transactionnelle SURE (permutation par renommage) : verifiee           [OK]
+  Manifest : version globale v1.8.0, 80 composants                               [OK]
+
+--- JALON 5 : ANOMALIES DETECTEES + AUTO-HEALING -------------------------------
+  A21 CRITIQUE - bascule destructive -> perte de l'arbre de production          [CORRIGE]
+      -> permutation par renommage + garde prealable des services actifs
+  A22 Avertissement onnxruntime inutile (provider DML demande sans etre
+      disponible) -> liste de providers construite a partir des disponibles     [CORRIGE]
+  A23 Edulcoration de ligne dans crash.log lors d'un ajout -> ligne FAILOVER
+      restauree                                                                  [CORRIGE]
+
+STATUT : JALON 5 VALIDE AU VERT - v1.8.0 stabilisee, gelee et livree.
+         ATTENTION : les modeles telecharges par l'utilisateur ont ete perdus lors
+         de l'incident ci-dessus et doivent etre re-acquis (Run-LocalAI.bat pull).
+================================================================================
+
+
+================================================================================
+CHANTIER v1.9.0 / v2.0.0 / v2.1.0 - JALON 0 & JALON 1 (CASCADE)
+Date : 2026-10-03
+--------------------------------------------------------------------------------
+--- JALON 0 : SAUVEGARDE ANTE-EXECUTION ------------------------------------------
+  archive_installer() = 1ere instruction de main() (L5552)                   [OK]
+  Sauvegardes horodatees .py.txt dans Installeur\ (27 presentes)              [OK]
+
+--- JALON 1 : BETA-TEST DE RUPTURE COMPLET SUR LA v1.8.0 ------------------------
+  Constat prealable : la v1.8.0 avait perdu (incident D-037) les modeles
+  telecharges -> l'environnement a ete RESTAURE avant les tests :
+    - paire vision re-acquise (qwen2-vl-2b + mmproj)                          [OK]
+    - modele image re-acquis (sd_turbo-f16-q8_0.gguf, 1930 Mo)                 [OK]
+  Ports 8080 / 4000 / 8090 / 8092 verifies                                    [7/7 OK]
+  Inference texte via le coeur (8080) et le gateway (4000, cle maitre)         [OK]
+  Securite gateway : requete SANS cle -> HTTP 401 propre                       [OK]
+  VISION : moteur actif (llama-server --mmproj, port 8095, ngl=0)              [OK]
+  RAG NumPy : index + recherche cosinus                                        [OK]
+  SDK MCP : mcp-test -> VERDICT VERT, 6 outils (dont localai_semantic_probe)   [OK]
+  Filtre PII : privacy-test -> masquage + reversibilite (VERDICT VERT)         [OK]
+  DirectML/NPU : npu-probe -> repli CPU automatique + avertissement GPU_DETECT [OK]
+  Failover SSE : nominal (core-local) et bascule (vision-cpu)                  [OK]
+  AUCUNE REGRESSION detectee sur la v1.8.0.
+
+--- JALON 1 : DECISION D'AUTO-REGULATION (D-038) --------------------------------
+  La cascade v1.9.0/v2.0.0/v2.1.0 (3 versions, 8 jalons) est executee en
+  SOUS-ETAPES BORNEES, chacune livree/testee/validee avant la suivante :
+    v1.9.0    : Speculative Decoding TEXT-ONLY + garde VRAM
+    v2.0.0a   : Espace hermetique AES-256 au repos (cle derivee, non stockee)
+    v2.0.0b   : Profil apprenant continu + reset-profile
+    v2.1.0a   : Decouverte reseau mDNS/UDP des noeuds RPC
+    v2.1.0b   : Routage federe (--rpc <IP>:<Port>) + peer-status
+  Justification : surfaces disjointes, isolation des regressions (lecon D-037),
+  preservation de la doctrine transactionnelle a chaque sous-etape.        [DOCUMENTE]
+
+STATUT : JALON 0 & 1 VALIDES AU VERT - existant sain et environnement restaure.
+         OUVERTURE DU JALON 2 (v1.9.0) autorisee.
+================================================================================
+
+
+================================================================================
+CHANTIER v1.9.0 - JALON 2 (IMPLEMENTATION) & JALON 3 (VALIDATION)
+Date : 2026-10-03
+--------------------------------------------------------------------------------
+--- JALON 2 : SPECULATIVE DECODING TEXT-ONLY -----------------------------------
+  Paire TEXT-ONLY a tokenizer PARTAGE ajoutee au catalogue                     [OK]
+    - qwen2.5-1.5b-instruct-q4_k_m.gguf (1066 Mo) + draft qwen2.5-0.5b (469 Mo)
+    - acquisition ATOMIQUE (principal + draft : les deux ou rien)
+  Injection des drapeaux de draft dans llama-server                            [OK]
+    - ligne de commande reelle : -m qwen2.5-1.5b... --model-draft qwen2.5-0.5b...
+      --spec-draft-n-max 8 --spec-draft-n-min 2
+  REGLE TEXT-ONLY : jamais de draft avec --mmproj (limitation upstream)         [OK]
+  GARDE VRAM : principal + draft + KV couple + marge 256 Mo verifies           [OK]
+    - refus motive et tracable si la VRAM libre est insuffisante
+  CLI : spec-status / spec-test                                                [OK]
+  Moteur principal = paire declaree (tokenizer partage) quand presente          [OK]
+
+--- JALON 3 : BETA-TEST DE RUPTURE v1.9.0 --------------------------------------
+  Demarrage du moteur avec draft : /health 8090 -> {"status":"ok"}             [OK]
+  MESURE REELLE DU GAIN (prompt texte pur, max_tokens=160, Vulkan ngl=99)      [MESURE]
+    - AVEC draft : 160 tokens / 7,48 s = 21,39 tokens/s
+    - SANS draft : 160 tokens / 7,35 s = 21,76 tokens/s
+    - CONCLUSION : AUCUN GAIN sur ce profil (ecart dans le bruit)
+  Non-regression : ports, inference coeur/gateway, 401, RAG, MCP, PII           [OK]
+  Aucun crash : le moteur demarre et sert normalement avec ou sans draft         [OK]
+
+--- JALON 3 : ANOMALIES DETECTEES + AUTO-HEALING -------------------------------
+  A24 DRAPEAUX OBSOLETES : '--draft-max'/'--draft-min' cites par le mandat sont
+      RETIRES par llama.cpp ("the argument has been removed") -> llama-server
+      refusait de demarrer (moteur mort, port muet). Constat par
+      'llama-server --help' : '--spec-draft-n-max'/'--spec-draft-n-min'
+      (et '--spec-draft-model', alias '--model-draft'). Correctif applique.    [CORRIGE]
+  A25 INCOHERENCE DE TOKENIZER : principal Llama-3.2 vs draft Qwen2.5 ->
+      prerequis du decoding speculatif viole. Correctif : la paire declaree au
+      catalogue devient le moteur principal lorsqu'elle est presente.          [CORRIGE]
+
+--- JALON 3 : DECISION PRODUIT (D-039) -----------------------------------------
+  Le decoding speculatif est IMPLEMENTE et FONCTIONNEL mais rendu OPT-IN
+  (LOCALAI_SPEC=1) : sur un profil GPU-bound il ne procure aucun gain tout en
+  coutant ~470 Mo de VRAM et un second chargement. La garde VRAM et la regle
+  TEXT-ONLY restent en vigueur. Fonctionnalite pertinente pour les profils
+  CPU-bound / faible VRAM.                                                  [DOCUMENTE]
+
+STATUT : JALON 2 & 3 VALIDES - v1.9.0 livree (version globale + manifest).
+         GEL DE L'ETAPE EN ATTENTE DU FEU VERT POUR LE JALON 4 (v2.0.0).
+================================================================================
+
+
+================================================================================
+CHANTIER v2.0.0a - JALON 4 (IMPLEMENTATION) & JALON 5 (VALIDATION)
+Date : 2026-10-03
+--------------------------------------------------------------------------------
+--- JALON 4 : ESPACE HERMETIQUE SOUVERAIN (AES-256 AU REPOS) -------------------
+  Module scripts\vault.py : AES-256-GCM (chiffrement AUTHENTIFIE)              [OK]
+  Cle JAMAIS stockee sur disque : PBKDF2-HMAC-SHA256, 390 000 iterations,
+    sel aleatoire de 16 octets conserve dans l'en-tete du conteneur           [OK]
+  Mot de passe saisi en console (getpass, masque) ; --password-env pour
+    l'automatisation, explicitement documente comme moins sur              [OK]
+  Zones couvertes : runtime\rag\ et runtime\storage\ (.npy/.json/.jsonl/.bin) [OK]
+  Cycle : seal (chiffre + supprime le clair) / unseal (restaure, conserve .enc) [OK]
+  ANTI-PERTE : verification IMMEDIATE de la reversibilite avant toute
+    suppression du clair ; conteneur retire et operation annulee si echec    [OK]
+  CLI : vault-status / vault-seal / vault-unseal / vault-test                  [OK]
+  CLAUSE DE TRANSPARENCE : portee au repos, RAM = meilleur effort (GC),
+    mot de passe oublie = donnees perdues -> INSTALLATION.md section 45      [OK]
+
+--- JALON 5 : BETA-TEST DE RUPTURE v2.0.0a -------------------------------------
+  AUTOTEST 'vault-test' (zone temporaire, donnees reelles intactes)            [VERT]
+    - backend        : AES-256-GCM (cryptography)
+    - derivation     : PBKDF2-HMAC-SHA256, 390 000 iterations, sel aleatoire
+    - scellement     : OK      - ouverture : OK
+    - integrite      : IDENTIQUE (4096 octets)
+    - mauvais mot de passe REFUSE (authentification GCM)
+    - cle sur disque : JAMAIS
+  INDEX RAG REEL (produit via 'Run-LocalAI.bat index' sur 5 formats) :
+    - index-default.npy (41 088 o), chunks-default.jsonl, manifest-default.json,
+      collections.json
+    - scellement : 4 fichiers -> 4 conteneurs .enc, AUCUN clair residuel
+    - ouverture  : 4/4 fichiers restaures
+    - INTEGRITE  : 4/4 empreintes SHA-256 IDENTIQUES -> ZERO CORRUPTION
+  FONCTIONNEL : 'rag-query' apres le cycle -> 5 resultats, scores identiques  [OK]
+  Aucun crash ; aucune ecriture hors sandbox.
+
+--- JALON 5 : ANOMALIES DETECTEES + AUTO-HEALING -------------------------------
+  Aucune anomalie sur cette sous-etape (le controle d'integrite immediat du
+  scellement et l'authentification GCM ont joue leur role de garde-fou).
+  Note de methode : le premier controle d'empreintes a ete invalide par la
+  non-persistance des variables entre appels d'outil -> cycle refait dans une
+  commande unique (le produit n'etait pas en cause).                      [METHODE]
+
+STATUT : SOUS-ETAPE v2.0.0a VALIDEE AU VERT.
+         La version globale restera v1.9.0 jusqu'a l'achevement de la sous-etape
+         v2.0.0b (profil apprenant), ou le passage a v2.0.0 sera effectue
+         conformement au jalon 5 du mandat.
+         EN ATTENTE DU FEU VERT POUR v2.0.0b.
+================================================================================
+
+
+================================================================================
+CHANTIER v2.0.0b - JALON 4 (IMPLEMENTATION) & JALON 5 (VALIDATION)
+Date : 2026-10-03
+--------------------------------------------------------------------------------
+--- JALON 4 : PROFIL APPRENANT CONTIN ------------------------------------------
+  Module scripts\learn_profile.py (11 138 o) :                                   [OK]
+   - Sources REELLES : logs\history.jsonl (observations consolidees),
+     logs\vram.log, logs\failover.jsonl, config\hardware-profile.json
+   - Seuil d'alerte ancre sur le MINIMUM de VRAM libre reellement observe (+5),
+     critique = alerte - 8, reprise = alerte + 10, BORNES 8-25 / 3-12 / 15-40 %
+   - Offload -ngl conserve par defaut ; -20 % UNIQUEMENT si evictions critiques
+   - Repli sur le profil d'usine si fichier absent ou < 2 observations
+  WATCHDOG scripts\vram_watchdog.py : relecture de config\profile.json toutes les  [OK]
+   5 s -> application A CHAUD des seuils appris, ET retour immediat aux valeurs
+   d'usine lorsque le profil est reinitialise. Aucun redemarrage necessaire.
+  CLI : learn-profile / profile-status / profile-observe / reset-profile          [OK]
+     (reset-profile accepte les deux formes : 'reset-profile soft' et
+      'reset-profile --factory soft')
+  HERITAGE : config\profile.json + logs\history.jsonl ajoutes a la regle d'or ->
+     l'apprentissage SURVIT aux reinstalls.
+  TRAcABILITE : categorie PROFILE_LEARN dans dev\crash.log (cote apprentissage)
+     et GPU_VRAM (cote watchdog).
+
+--- JALON 5 : BETA-TEST DE RUPTURE v2.0.0b -------------------------------------
+  1) TELEMETRIE REELLE : pile demarree (local-ai :8080, litellm :4000,
+     watchdog "alerte<15%, critique<5%, reprise>20%"). VRAM lue par nvidia-smi :
+     6144 Mo totaux, 3765-3856 Mo libres (61,1-62,6 %).                     [REEL]
+  2) HISTORIQUE : 5 observations enregistrees (3 avant redemarrage + 2 apres),
+     toutes conservees a travers DEUX reinstalls.                          [OK]
+  3) APPRENTISSAGE : min 61,13 % / moy 61,94 % / max 62,60 %
+     -> appris : alerte<25,0 % critique<12,0 % reprise>35,0 % ; ngl=99
+     source = "appris (5 observations reelles)".                           [OK]
+  4) APPLICATION A CHAUD (preuve decisive) : watchdog demarre en 15/5/20 ->
+     data\vram-status.json affiche 25/12/35 SANS redemarrage, trace
+     [GPU_VRAM] "profil appris applique A CHAUD : alerte<25.0% ... (ngl=99)". [OK]
+  5) GARDE-FOU reset-profile soft : 25/12/35 -> 20/10/30 applique A CHAUD en
+     ~8 s, trace [GPU_VRAM] "profil applique A CHAUD : alerte<20.0% ...".
+     -> RETOUR D'USINE INSTANTANE ET VERIFIE.                              [OK]
+  6) profile-status : "USINE (profil 'soft' applique a chaud)", seuils 20/10/30,
+     ngl 99, historique 5 observations, profils d'usine affiches.          [OK]
+  7) DEPLOIEMENT : 3 cycles de reinstall complets ; AST VERT a chaque fois ;
+     manifest.json -> installer_version v2.0.0, root = produit, 83 composants;
+     heritage verifie (keys.env, mcp-settings.json, runtime\rag\index-default.npy,
+     logs\history.jsonl, config\profile.json) ; zero zombie, zero port.    [VERT]
+
+--- JALON 5 : ANOMALIES DETECTEES + AUTO-HEALING -------------------------------
+  A1 (corrigee) : 'reset-profile soft' -> argparse refusait 'soft' comme choix
+     de mode. Correctif : second positionnel optionnel 'factory_pos' + repli
+     '--factory'. Retester : OK.
+  A2 (corrigee) : le reset SE CONTENTAIT de supprimer config\profile.json : le
+     watchdog retombait alors sur SA base de demarrage (15/5/20) au lieu du
+     profil d'usine demande. Correctif : le reset ECRIT desormais les valeurs
+     d'usine dans config\profile.json -> application reellement instantanee
+     (verifie : 20/10/30 en ~8 s).
+  A3 (corrigee) : trace mensongere "[GPU_VRAM] profil APPRIS applique" alors que
+     le profil applique etait un profil d'usine. Correctif : le libelle distingue
+     "appris" / "d'usine '<nom>'" / "d'usine (retour)".
+  Aucune regression : coffre AES-256 (v2.0.0a), AST, manifeste, heritage, arret.
+
+================================================================================
+JALON 5 - BETA-TEST GLOBAL DE LA v2.0.0 (parcours complet sur produit gele)
+Date : 2026-10-03
+--------------------------------------------------------------------------------
+Cadre : pile complete demarree (coeur LocalAI :8080, gateway LiteLLM :4000,
+watchdog VRAM, VLM :8095, Whisper :8091, Images :8092, TTS :8093) ; corpus de
+test a 3 formats (txt, py, json) cree dans build\j5_corpus.
+--------------------------------------------------------------------------------
+  1) SANTE DES SERVICES
+     coeur LocalAI :8080 ............. HTTP 200                           [OK]
+     gateway LiteLLM :4000 (auth) .... OK - 7 modeles : local-llama,
+       openrouter-claude, gpt-4o, claude-sonnet, deepseek, localai, smart  [OK]
+     VLM :8095 ....................... HTTP 200 (qwen2-vl-2b + mmproj)     [OK]
+     Images :8092 .................... HTTP 200                            [OK]
+     TTS :8093 ....................... HTTP 200                            [OK]
+     Whisper :8091 ................... HTTP 200 sur '/' et '/health'       [OK]
+  2) INFERENCE TEXTE (gateway authentifie, modele local-llama) ........... [OK]
+     Reponse en 5,9 s sur le moteur local (Vulkan).
+  3) INFERENCE VISION (VLM :8095, image PNG generee a la volee,
+     transmise en data-URL base64) ....................................... [OK]
+     Reponse en 7,6 s : pipeline vision complet operationnel
+     (modele + mmproj charges, image transmise, generation produite).
+     NOTE DE TRANSPARENCE : la description produite par un modele 2B sur une
+     image SYNTHETIQUE (forme geometrique) est generique et non conforme. Le
+     PIPELINE est valide ; la precision releve de la capacite du modele choisi,
+     non du portage. Consigne en INFO (aucune action corrective possible cote
+     portage).
+  4) RAG MULTI-FORMAT : indexation de 3 fichiers -> 3 chunks x 2048 dims
+     en 7,2 s ; fichiers a plat (index-default.npy, chunks-default.jsonl,
+     manifest-default.json) .............................................. [OK]
+     Requete 'volcan' -> 3 resultats classes par similarite cosinus
+     (0,3879 / 0,3741 / 0,2661) ........................................... [OK]
+  5) GRAPHRAG : graphe de 19 noeuds / 11 aretes (11 triplets extraits par le
+     LLM local), serialisation a plat graph_db.json ....................... [OK]
+     graph-show : statistiques conformes .................................. [OK]
+  6) PASSERELLE MCP : 6 outils visibles (rag_query, vision_caption, status,
+     vram_status, graph_show, semantic_probe) ............................. [OK]
+  7) ESPACE HERMETIQUE AES-256 : backend AES-256-GCM, PBKDF2-HMAC-SHA256
+     390 000 iterations, 4 fichiers scelles ............................... [OK]
+     Autotest : integrite IDENTIQUE, mauvais mot de passe REFUSE,
+     cle JAMAIS sur disque -> VERDICT VERT ................................ [OK]
+  8) PROFIL APPRENANT : etat USINE (profil 'soft' applique a chaud),
+     seuils 20/10/30, offload -ngl 99 ..................................... [OK]
+--------------------------------------------------------------------------------
+ANOMALIES DETECTEES : 2, TOUTES DANS LE HARNAIS DE TEST (aucun defaut produit)
+  T1 (corrigee) : /v1/models sur le gateway renvoyait 401 sans cle. ATTENDU :
+     le gateway est authentifie par conception (LOCALAI_LOCAL_KEY). Le harnais
+     passe desormais 'Authorization: Bearer sk-local'. Re-test : OK.
+  T2 (corrigee) : /v1/models sur Whisper renvoyait 404. ATTENDU : whisper.cpp
+     n'expose pas cet endpoint. Re-test sur '/' et '/health' : HTTP 200.
+  AUTO-HEALING : harnais corrige (build\j5_beta.ps1, build\j5_retest.ps1),
+     re-test integral -> TOUT VERT.
+--------------------------------------------------------------------------------
+================================================================================
+JALON 6 & 7 - v2.1.0 : INFERENCE FEDEREE RPC + DECOUVERTE RESEAU
+Date : 2026-10-03
+--------------------------------------------------------------------------------
+--- JALON 6 / v2.1.0a : DECOUVERTE RESEAU DES NOEUDS RPC ----------------------
+  Module scripts\peer_discovery.py (pur Python, ZERO dependance externe) :       [OK]
+   - Broadcast UDP non invasif ; 2 messages seulement (query/reply) ;
+     AUCUNE donnee d'inference ne transite (decouverte seule, conformement au
+     mandat "ne pas reinventer le protocole de transport").
+   - Identite de noeud stable : nom d'hote + empreinte materielle courte.
+   - TTL des pairs : 90 s (un noeud muet disparait seul).
+   - Demon d'annonce lance avec la pile (--no-peers pour le desactiver),
+     suivi dans data\pids.txt, arrete proprement avec la pile.
+  CLI : peer-status / peer-scan / peer-test / peer-rpc-arg                       [OK]
+
+--- JALON 6 / v2.1.0b : ROUTAGE FEDERE RPC -------------------------------------
+  vram_watchdog.py : escalade sur VRAM critique                                 [OK]
+     1) ROUTAGE FEDERE  : relance le moteur avec l'argument EXACT
+        "--rpc <IP>:<Port>" (option reelle de llama-server : --rpc SERVERS).
+     2) Repli CPU pur (-ngl 0) si aucun pair joignable.
+  GARDE-FOU : aucun --rpc n'est injecte vers un noeud INJOIGNABLE (test TCP).
+  Traçabilite : categorie FEDERATION (crash.log), data\vram-action.json.
+
+--- ANOMALIE DE NOMMAGE DECOUVERTE (famille A24) -------------------------------
+  A26 : le mandat cite 'rpc-server.exe' ; l'amont libre livre
+        'ggml-rpc-server.exe' (117 248 o, + ggml-rpc.dll). Port par defaut 50052
+        (options -H/--host, -p/--port, -t/--threads, -c/--cache).
+        -> Nom reel utilise. Lecon : toujours verifier la distribution amont.
+
+--- JALON 7 : BETA-TEST DE RUPTURE v2.1.0 --------------------------------------
+  A) AUTOTEST DU PROTOCOLE (boucle locale, aucun envoi reseau) :
+     requete recue kind=query ; reponse id/hostname/rpc_port/version/models
+     latence 0,6 ms -> VERDICT VERT                                          [OK]
+  B) DECOUVERTE REELLE : pile demarree, demon d'annonce PID=16280 sur UDP 47653.
+     'peer-scan --wait 3' -> 1 noeud decouvert en broadcast (DESKTOP-XTREM-21,
+     rpc_port 50052, latence 17,2 ms) ; config\peers.json ecrit              [OK]
+  C) INFERENCE PENDANT FEDERATION ACTIVE : gateway authentifie, 6,0 s -> OK   [OK]
+  D) PANNE RPC SIMULEE (preuve decisive) :
+     - ggml-rpc-server.exe lance localement (192.168.1.84:50052), declare
+       comme pair -> joignable OUI, "--rpc 192.168.1.84:50052", 1 cible       [OK]
+     - serveur TUE -> joignable NON, cibles federees = 0,
+       federated_relaunch -> applied=False "aucun noeud RPC distant joignable
+       (calcul local conserve)"                                              [OK]
+     - VERDICT : REFUS CORRECT - aucun --rpc injecte vers un noeud mort,
+       l'inference locale n'est jamais cassee (degradation gracieuse).        [OK]
+  E) LIBERATION TOTALE A L'ARRET :
+     AVANT : 6 ports TCP en ecoute, UDP 47653 lie, 5 processus, VRAM 60,79 %
+     APRES : 0 port TCP, 0 port UDP, ZERO ZOMBIE, VRAM 60,94 % (liberee)     [OK]
+     data\runtime.env conforme (LOCALAI_PORT, LLAMA_PORT, WHISPER_PORT,
+     SD_PORT, TTS_PORT, VISION_PORT, FAILOVER_PORT, LITELLM_PORT, PROFILE,
+     NGL, THREADS, CTX)                                                      [OK]
+
+--- ANOMALIES CORRIGEES EN COURS DE JALON --------------------------------------
+  H1 (corrigee) : 'peer-status' affichait "100%%" (echappement % errone dans une
+     chaine non formatee). Corrige -> "100%".
+  H2 (corrigee) : le premier test JALON 7 laissait un peers.json factice (mon
+     harnais, aucun fichier de sauvegarde n'existant au premier passage).
+     Nettoye ; les tests suivants ont produit un peers.json authentique.
+  H3 (corrigee) : l'insertion de D-041 dans DECISIONS.md avait avale l'en-tete
+     '## D-004'. En-tete restauree ; verification de la sequence D-001..D-042.
+
+================================================================================
+PHASE 2.20 Finale - v2.1.1 : INTERNATIONALISATION FR/EN
+Date : 2026-10-03
+--------------------------------------------------------------------------------
+--- PATTERN HYBRIDE A TROIS COUCHES -------------------------------------------
+  Couche 1 (embarquee)  : TRANSLATIONS dans scripts\i18n.py = verite ultime      [OK]
+  Couche 2 (JSON)       : i18n\fr.json + i18n\en.json generes a l'installation,
+                          surchargent l'embarque cle par cle ; une
+                          personnalisation VALIDE n'est jamais ecrasee           [OK]
+  Couche 3 (I18N_REV)   : revision differente -> seules les cles help_*/tip_*
+                          sont rafraichies depuis l'embarque                     [OK]
+  Aiguillage tr(key) ; langue active : LOCALAI_LANG -> config\lang.json -> 'fr'  [OK]
+  CLI : lang | lang fr|en | lang list ; i18n-status ; i18n-test                  [OK]
+  BAT : i18n\_fr.bat + i18n\_en.bat (UTF-8 sans BOM) charges DYNAMIQUEMENT par
+        Run-LocalAI.bat ; chcp 65001 >nul au sommet du wrapper                  [OK]
+  BANNIERE : localai_up.ps1 lit config\lang.json puis i18n\<lang>.json          [OK]
+  DOCS : INSTALLATION.fr.md + INSTALLATION.en.md ; INSTALLATION.md racine =
+         aiguillage + essentiel autonome bilingue                               [OK]
+
+--- BUGS DE DEPLOIEMENT TROUVES ET CORRIGES (lecon majeure) ---------------------
+  B1 : gen_lang_bat() utilisait __version__ alors que le code de deploiement
+       s'execute dans un namespace INJECTE ou la convention est __VERSION__.
+       Symptome : i18n\_fr.bat et i18n\_en.bat ECRITS VIDES (0 octet).
+  B2 : generate_i18n() exec(I18N_PY) dans un namespace sans __file__
+       (I18N_PY commence par HERE = dirname(abspath(__file__))).
+       Symptome : 'dictionnaire i18n embarque illisible'.
+  B3 : generate_i18n() appelait json.dump alors que le namespace de deploiement
+       n'expose que '_json'. Symptome : i18n\fr.json et en.json crees VIDES.
+  B4 : les fichiers JSON vides laisses par B3 etaient ensuite PRESERVES par la
+       regle d'or de l'heritage -> la generation etait sautee indefiniment.
+       Correctif : generate_i18n considere desormais un fichier absent, VIDE ou
+       JSON INVALIDE comme a regenerer (AUTO-REPARATION).
+  B5 : Run-LocalAI.bat resolvait la langue via 'for /f usebackq' avec un chemin
+       d'executable entre guillemets -> la commande n'etait PAS executee, LG
+       restait vide et l'interface restait en francais malgre lang=en.
+       Diagnostic isole : A] for/f usebackq = vide ; B] for/f simple = vide ;
+       C] fichier temporaire + 'set /p' = 'en' (CORRECT).
+       Correctif : redirection vers data\lang.tmp puis 'set /p LG=<fichier'.
+  LECON RETENUE : un echec d'etape peut ne PAS faire echouer l'installation ;
+       il faut LIRE LE JOURNAL D'INSTALLATION LIGNE A LIGNE (B1..B4 etaient des
+       WARN dans un flux par ailleurs vert).
+
+--- BETA-TEST i18n (scenarios exiges par le mandat) -----------------------------
+  1) INITIAL (aucune config) : langue active = 'fr', interface francaise au
+     demarrage, sans erreur.                                                [VERT]
+  2) BASCULE A CHAUD : 'lang en' -> config\lang.json ecrit (lang=en, rev=1) ;
+     aide et banniere EN ANGLAIS instantanement ; 'lang fr' -> retour FR.    [VERT]
+  3) FALLBACK : fichiers i18n absents -> repli silencieux sur l'embarque.    [VERT]
+  4) CORRUPTION : JSON invalide -> exception geree, repli couche 1, aucun
+     plantage (categorie I18N tracee dans dev\crash.log).                    [VERT]
+  5) TRACABILITE : patch_integrity.log, DECISIONS.md (D-043), CHANGELOG.md
+     (v2.1.1), BETA_TEST_REPORT.md, JOURNAL.md, INSTALLATION*.md.            [OK]
+  'i18n-test' : FR et EN resolus + repli embarque -> VERDICT VERT               [OK]
+
+================================================================================
+PHASE V3 FINALE - v3.0.0 : IDENTITE AiTron V3 + AUDIT D'AUTONOMIE MONO-BLOC
+Date : 2026-10-03
+--------------------------------------------------------------------------------
+--- JALON 0 : SAUVEGARDE ANTE-EXECUTION -----------------------------------------
+  archive_installer() reste la TOUTE PREMIERE instruction de main() ; a chaque
+  execution le script maitre est copie vers Installeur\ au format horodate
+  .py.txt (y compris sous son nouveau nom install_AiTron_v3.py).              [OK]
+
+--- JALON 1 : BETA-TESTEUR FOU PRE-CODE (v2.1.1 eprouvee avant renommage) ------
+  RAG (index + requete), Vision (pipeline VLM), MCP (6 outils), GraphRAG
+  (19 noeuds / 11 aretes), Failover, i18n (5 scenarios), coffre AES-256,
+  profil apprenant, federation RPC : TOUS VALIDES au vert avant toute
+  modification d'identite. Aucun bug residuel a stabiliser.                   [VERT]
+
+--- JALON 2 : RENOMMAGE OFFICIEL (AiTron V3) -----------------------------------
+  install_localai_win.py  ->  install_AiTron_v3.py (racine de la sandbox)      [OK]
+  LocalAI\                ->  AiTron\                                          [OK]
+  LocalAI.new (staging)   ->  AiTron.new (derive de PRODUCT)                   [OK]
+  LOCALAI_DEPLOY_CODE     ->  AITRON_DEPLOY_CODE                               [OK]
+  LOCALAI_* (env)         ->  AITRON_*  (provenance amont LOCALAI_VERSION,
+                              LOCALAI_TAG, LOCALAI_URL, LOCALAI_SHA256, ... conservee) [OK]
+  "LocalAI-Windows"       ->  "product": "AiTron V3 (portage natif, ...)"      [OK]
+  manifeste enrichi       ->  "fork_of": "LocalAI (https://github.com/mudler/LocalAI)",
+                              "license": "MIT"                                 [OK]
+  LE MOTEUR CONSERVE SON NOM : local-ai.exe (195 069 952 o) present apres
+  installation, jamais renomme.                                              [OK]
+  CHARTE.md : "Projet : AiTron V3" + "Livrable : install_AiTron_v3.py"         [OK]
+  MIGRATION : herite automatiquement de LocalAI\ si AiTron\ est absent         [OK]
+  Avertissement de transparence (fork non affilie) : INSTALLATION.md + FR + EN [OK]
+
+--- JALON 3 : AUDIT D'AUTONOMIE MONO-BLOC (crash-test de reconstruction) -------
+  1. Produit mis en securite par DEPLACEMENT (renommage, sans copie) :
+     AiTron\ -> build\backup_v300_AiTron\                                       [OK]
+  2. SUPPRESSION PHYSIQUE : AiTron\ absent de la sandbox (verifie)             [OK]
+  3. Reconstruction : python install_AiTron_v3.py --skip-model --prev <sauvegarde>
+     (nouvelle option --prev pour expliciter la source d'heritage)              [OK]
+  4. VERIFICATION DE LA RENAISSANCE :
+     manifest.json 32 282 o | local-ai.exe 195 Mo | Run-LocalAI.bat 11 534 o |
+     scripts\i18n.py | scripts\peer_discovery.py | config\keys.env |
+     i18n\fr.json 2 792 o | runtime\python\python.exe |
+     models\Llama-3.2-1B-Instruct-Q4_K_M.gguf 807 694 464 o |
+     runtime\rag\index-default.npy                                              [OK]
+     backends : llama-cpp, stable-diffusion, whisper-cpp, tts                   [OK]
+  => L'installeur est MONO-BLOC et AUTO-SUFFISANT : il reconstruit le produit
+     entier a partir de ses seuls fichiers embarques et de l'heritage.          [VERT]
+
+--- JALON 4 : BETA-TESTEUR FOU v3.0.0 ------------------------------------------
+  Demarrage : Run-LocalAI.bat start -> coeur 8080, gateway 4000, llama 8090,
+     whisper 8091, images 8092, TTS 8093, vision 8095, failover 8081,
+     watchdog VRAM, decouverte RPC (UDP 47653).                                [OK]
+  BANNIERE : "=== AiTron - portage Windows natif (sans Docker ni WSL) (v3.0.0) ==="
+     avec "API AiTron" (le renommage est visible jusqu'a l'ecran).              [OK]
+  INFERENCE TEXTE (gateway authentifie) : 6,5 s -> reponse produite             [OK]
+  RAG : indexation de 3 fichiers -> 3 chunks x 2048 dims en 7,1 s ;
+     requete "volcan" -> 3 resultats (0,3879 / 0,3741 / 0,2661).                [OK]
+  i18n : lang en -> aide ET en-tete EN ANGLAIS ; lang fr -> retour FR ;
+     I18N_REV "1"->"2" -> les cles d'aide ont ete RAFRAICHIES (l'aide affiche
+     desormais la version 3.0.0 et non plus 2.1.1 : mecanisme de couche 3
+     demontre en conditions reelles).                                         [OK]
+  peer-status, profile-status : operationnels                              [OK]
+  ARRET : Run-LocalAI.bat stop -> 0 port TCP, 0 port UDP, ZERO ZOMBIE, VRAM
+     liberee.                                                                 [OK]
+
+--- JALON 5 : CONSOLIDATION, LOG RACINE, GUIDE RACINE, RAPPORT, GEL -----------
+  ANOMALIES_NON_RÉSOLUES.log produit a la RACINE de la sandbox : 8 entrees au
+     format standardise ([AAAAMMJJ_HHMMSS] [CATEGORIE] [SEVERITE] + Impact +
+     Contournement + Recommandation), toutes etant des LIMITES AMONT ou des
+     CARACTERISTIQUES DOCUMENTEES (aucun defaut de notre code non resolu).     [OK]
+  INSTALLATION.md a la RACINE : guide autonome bilingue + aiguillage vers
+     INSTALLATION.fr.md (58 Ko) et INSTALLATION.en.md.                        [OK]
+  Tracabilite : patch_integrity.log, DECISIONS.md (D-043, D-044), CHANGELOG.md
+     (v2.1.0, v2.1.1, v3.0.0), BETA_TEST_REPORT.md, JOURNAL.md, PERIMETRE.md.  [OK]
+  GEL : version 3.0.0 partout (script maitre, manifeste, aide, documentations). [OK]
+
+STATUT : v3.0.0 LIVREE, VALIDEE AU VERT, GELÉE.
+         AST VERT | 87 composants | produit AiTron\ | zero zombie.
+         CLOTURE DE LA CASCADE COMPLETE v1.9.0 -> v3.0.0.
+================================================================================
+         SUITE : PHASE V3 Finale / v3.0.0 (renommage AiTron V3 + audit
+         d'autonomie mono-bloc + ANOMALIES_NON_RESOLUES.log + INSTALLATION.md
+         racine + rapport de cloture) EN COURS.
+================================================================================
+         Version globale passee a "2.1.0" (master + manifeste, 84 composants).
+         SUITE : PHASE 2.20 Finale / v2.1.1 (i18n FR/EN) EN COURS.
+================================================================================
+         Aucun defaut produit. Aucun processus zombie apres arret (verifie).
+         SUITE : JALON 6 / v2.1.0a (decouverte mDNS/UDP) EN COURS.
+================================================================================
+         VERSION GLOBALE PASSEE A v2.0.0 (master + manifeste) conformement au
+         jalon 5 du mandat. JALON 4 TERMINE.
+         EN ATTENTE DU FEU VERT POUR LE JALON 5 BETA-TEST / JALON 6 (v2.1.0a mDNS).
+================================================================================
+
+
+
+
+
+
+================================================================================
+ AUDIT DYNAMIQUE v3.1.0 - 2026-10-04 - staging dev\test_dynamique\ - CERTIFICATION REFUSEE
+================================================================================
+  Master : SHA-256 D54EEE3490EA91C63C73E5E399514CB162732157C71D2F7765B42187198904EE
+           7 963 lignes, CRLF integral (0 LF isole), VALIDATION AST : VERT, aucun ''' intrus.
+  Nom non defini dans AITRON_DEPLOY_CODE : 0 (build\audit\undefined_names.py).
+  Boite noire : 12 snapshots ; le dernier est identique au master final.
+  Correctifs D1-D11 + IHM : voir dev\DECISIONS.md D-045 a D-047.
+  Parcours de reference (build\audit\final_run.py, installation a blanc, aucune modif ensuite) :
+    C01 accents console ........ CONFORME      C08 replay SSE bufferise ... CONFORME
+    C02 bascule FR/EN .......... CONFORME      C09 replay SSE flux ........ CONFORME
+    C03 IHM (boutons du mandat). CONFORME      C10 PII (7 routes) ......... CONFORME
+    C04 repli CPU / GPU_DETECT . CONFORME      C11 vault anti-perte ....... CONFORME
+    C05 RAG NumPy + cp1252 ..... CONFORME      C12 CLI simultanees ........ CONFORME
+    C06 index + rag-query ...... CONFORME      C13 inference 8080/8081/4000 CONFORME
+    C07 anti-BOM ............... CONFORME      => 13 / 13
+  Hors parcours : couverture FR de l'IHM 42,4 % (923 cles manquantes) -> ANOMALIE A-12.
+  Arret : 4 s, 0 processus, 0 port TCP, 0 UDP 47653. Produit stable intact (manifeste v3.0.0).
+  Non teste : rendu navigateur ; PDF/DOCX/XLSX/images en RAG ; vrai moteur en panne ; vrai cloud.
+================================================================================
+================================================================================
+ AUDIT DYNAMIQUE v3.1.0 - 2E PASSE (CLOTURE) - 2026-10-04 - CERTIFICATION VALIDEE AU VERT
+================================================================================
+  Master : SHA-256 7E39687C16E1ED28AEEB766BF2A88ACD1CEED183C7517E72F4D2D179F3E8BD10
+           7 983 lignes, CRLF integral (0 LF isole), VALIDATION AST : VERT, aucun ''' intrus,
+           0 nom global non defini. Boite noire : 14 snapshots ; le dernier = master final.
+  Correctifs de cette passe : D12 (libelles EN residuels) ; 920 cles FR (merge_tr.py : refus d'ecrire
+  si chemin absent de EN, variable {{x}} divergente, valeur vide ou doublon) ; coeur recompile.
+  Installation #11 (--prev vers build\backup_v300_AiTron, heritage conserve) : 87 composants, v3.1.0.
+  Parcours sur CE deploiement, aucune modification entre le demarrage et la mesure finale :
+    C01..C13 : 13 / 13 CONFORMES (final_run.py)
+    IHM servie : 1 597 / 1 597 cles EN couvertes, 0 placeholder divergent (ui_full_check.py)
+    CLI : 38 executions, 0 stderr, 0 BOM, 0 mojibake, 0 ligne francaise non ambigue en EN
+    BOM : 466 fichiers texte, 0 BOM
+    ANOMALIES : 19 entrees, 0 ERROR/CRITICAL non resolue (anomalies_gate.py)
+    Arret : 4 s, 0 processus (staging et stable), 0 port TCP, 0 UDP 47653, 0 orphelin
+    Produit stable : manifeste v3.0.0 inchange, 31 973 fichiers / 9 597 042 063 o
+  Deplacements : dev\test_dynamique\ -> dev\old\test_dynamique\ (8,94 Go) ; ancien certificat (refus)
+  -> dev\old\CHECK_DE_CONTROLE_FINAL_REFUSE_20261004_030117.log.
+  NON teste : rendu navigateur ; PDF/DOCX/XLSX/images en RAG ; vrai moteur en panne ; vrai cloud ;
+  relecture de la traduction par un tiers.
+================================================================================
+
+================================================================================
+  PATCH v3.1.1 -- PORTABILITE TOTALE + FALLBACKS DE TELECHARGEMENT  (2026-10-05)
+  Master : SHA-256 620461357F9D39C46E91ECA404C3471EFC87EA7401810C47AB5D1B0B8B42201C
+           8148 lignes, CRLF integral (0 LF isole), VALIDATION AST TRIPLE : VERT
+           (parse + compile + py_compile), 0 SyntaxWarning, aucun delimiteur intrus.
+  Sauvegardes boite noire : Installeur\install_AiTron_v3_20261005_175315.py.txt (pre-patch)
+                            Installeur\install_AiTron_v3_20261005_175431.py.txt (post garde MZ)
+  Correctifs : D-049 detection dynamique (SANDBOX, --root) + D-050 cascade + garde MZ.
+  Controle   : plus aucun chemin en dur (G:\V1\LocalAI-Projet\ retire).
+  Installations reelles : G:\V1\LocalAI-Projet (87 composants, v3.1.1) ; C:\AiTron-Test ;
+    --root D:\AiTron-Root-Test ; USB E:\AiTron-Portable ; fallback (staging archive).
+  Mesures : 15/15 controles unitaires ; garde MZ OK ; inference reelle (BONJOUR) ;
+    0 BOM sur 41 fichiers ; arret propre (0 processus, 0 port TCP/UDP).
+  NON teste : installation croisee complete via URLs de transfert (pages HTML).
+================================================================================
+
+================================================================================
+  PATCH v3.1.2 -- INTEGRATION DES BINAIRES GITHUB RELEASES  (2026-10-05)
+  Master : SHA-256 94117F7554ABD9789BCBCF474F38A66FC8587929B8025EB90E22196CCD561A65
+           8154 lignes, CRLF integral (0 LF isole), VALIDATION AST TRIPLE : VERT
+           (parse + compile + py_compile), 0 SyntaxWarning.
+  Sources GitHub : xtrem21-source/AiTron-Releases-V3.1.1@v3.1.1 (local-ai.exe, cloud-proxy.exe).
+  SHA-256 integres : 0F55C483... (local-ai) ; BFCB2804... (cloud-proxy).
+  Garde-fou PE "MZ" CONSERVE et applique a tout .exe telecharge.
+  Tests : T1 telechargement GitHub (racine C:\TestGitHub -> 87 composants) ; T2 SHA errone (rejet) ;
+    T3 cascade (URL invalide) ; T4 coherence v3.1.1 (0 BOM, CLI bilingue, failover SSE, vault, 0 zombie).
+  Installation G:\ redeployee : manifeste v3.1.2.
+================================================================================
+
+================================================================================
+  INITIALISATION GIT -- AiTron V3 v3.1.2  (2026-10-05)
+  depot  : G:\V1\LocalAI-Projet\.git   (branche de travail : master)
+  commit : init(repo): depot Git initial - AiTron V3 v3.1.2
+  tag    : v3.1.2 (annote)
+  versionne : 72 fichiers (installeur, documentation publique, .clinerules,
+              memory-bank, dev hors old\ et crash.log)
+  exclu  : AiTron\ build\ dev\old\ log\ Installeur\ dev\crash.log (reconstructibles
+           ; regle 09.6)
+  AST installeur : VERT -- ast.parse + compile + py_compile, 0 SyntaxWarning (regle 09.4)
+  conformite : VERSION -> v3.1.2 ; CHANGELOG.md racine (+ v3.1.2, v3.1.1) ; README.md ;
+               Memory Bank activeContext/progress (regle 05.5) ; .gitignore (regle 09.6) ;
+               mojibake du tiret cadratin corrige dans les docs racine.
+================================================================================

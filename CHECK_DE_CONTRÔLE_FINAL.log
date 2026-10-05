@@ -1,0 +1,84 @@
+================================================================================
+               AITRON V3 — RAPPORT D'AUDIT ET DE CONTRÔLE FINAL
+================================================================================
+Date : 20261004_035221 | Validateur : Cline (Moteur Sémantique Pro)
+Version certifiée : v3.1.0 | Sandbox : G:\V1\LocalAI-Projet\
+Périmètre audité : installeur install_AiTron_v3.py (SHA-256 7E39687C...F3E8BD10, 7 983 lignes, CRLF)
+  et produit de STAGING déployé à blanc dans dev\test_dynamique\ (87 composants, manifeste v3.1.0),
+  désormais archivé dans dev\old\test_dynamique\ (8,94 Go, 32 419 fichiers).
+  Historique : 1ère passe = CERTIFICATION REFUSÉE (couverture FR de l'IHM 42,4 %), archivée dans
+  dev\old\CHECK_DE_CONTRÔLE_FINAL_REFUSE_20261004_030117.log. Cette 2e passe a traduit les clés
+  manquantes, recompilé le cœur et redéployé ; tous les contrôles ci-dessous portent sur ce dernier
+  déploiement (installation #11, avec --prev vers la sauvegarde v3.0.0), sans modification entre
+  le démarrage et la dernière mesure.
+  Le produit stable G:\V1\LocalAI-Projet\AiTron\ n'a PAS été touché : manifeste v3.0.0, 31 973
+  fichiers / 9 597 042 063 o, empreinte SHA-256 identique avant et après l'audit.
+
+ CONTRÔLE DE L'IHM ET DU BILINGUISME (FR/EN) :
+    - État de la traduction des boutons ("Interagir", etc.) : CONFORME
+        IHM servie par :8080 : 1 597 / 1 597 clés anglaises ont leur équivalent français (100,0 %),
+        14 espaces de noms, 0 variable {{x}} divergente, 0 BOM, 0 U+FFFD, sélecteur « fr » présent.
+        Boutons du mandat (FR servi) : Démarrage…, Arrêter, Discussion, Conversation vocale, Modèles,
+        Gérer l'installation, Paramètres. 94 clés identiques à l'anglais (termes techniques, sigles,
+        noms propres : Backend, Cluster, GPU, YAML, Hugging Face...), détaillées dans DECISIONS D-048.
+        Limite : contrôle sur les fichiers servis, SANS navigateur ; le rendu visuel (longueur des
+        libellés, retours à la ligne) n'a pas été vérifié. Titre d'onglet « LocalAI » inchangé (amont).
+    - Comportement de la bascule à chaud via CLI : CONFORME
+        4 bascules lang en/fr, 19 commandes x 2 langues = 38 exécutions : 0 erreur stderr, 0 BOM,
+        UTF-8 strict, 0 ligne française non ambiguë en mode EN (start et stop inclus).
+    - Statut de l'encodage des accents console (chcp 65001) : CONFORME
+        0 caractère U+FFFD ou mojibake sur 38 exécutions ; dev\check_terminal_encoding.py rc=0.
+    - Comportement du repli CPU sur l'accélérateur ONNX : CONFORME
+        npu-probe et hardware-status : provider cpu, session préservée ; 30 entrées [GPU_DETECT]
+        dans le crash.log du staging.
+
+ CONTRÔLE DE L'AUTONOMIE ET DES PIPELINES :
+    - Intégrité de l'extraction multi-format NumPy (RAG) : CONFORME (périmètre limité)
+        Index réel .npy (1 chunk x 2048 dims), 3 formes de rag-query dont ligature « cœur »,
+        texte cp1252 (œ, « », €) restitué ; dev\test_rag_stress.py rc=0.
+        NON rejoués : PDF, DOCX, XLSX, images.
+    - Intégrité de l'écriture des commandes JSON (Anti-BOM) : CONFORME
+        466 fichiers texte du produit examinés, 0 BOM ; 9 JSON parsés en mode strict.
+    - Fluidité de la bufferisation du proxy et du Failover SSE : CONFORME
+        Mode bufferisé et mode flux : texte reçu une seule fois, [DONE] présent, route de secours.
+        Pannes simulées par de faux serveurs locaux, pas par un vrai moteur ni un vrai cloud.
+    - Étanchéité du masquage et de l'anonymisation Cloud (PII) : CONFORME
+        7 routes : 0 fuite. Journal [PRIVACY_FILTER] : 148 entrées, aperçus tronqués.
+        Aucun appel réseau réel vers OpenRouter (clé fictive) : logique du routeur testée.
+    - Fiabilité de l'anti-perte de la zone hermétique (Vault) : CONFORME
+        Écriture du conteneur tronquée (simulée) : exception, clair CONSERVÉ ; vault-test VERT.
+    - État des processus orphelins à l'arrêt (zéro zombie) : CONFORME
+        Arrêt en 4 s : 0 processus staging, 0 processus stable, 0 port TCP, 0 UDP 47653, 0 orphelin.
+
+ SYNTHÈSE DES AMÉLIORATIONS APPORTÉES PAR AUTO-HEALING :
+    D1  Invocations CLI simultanées : data\lang.tmp partagé (7/8 en échec) -> lecture directe.
+    D2  RAG : cp1252 essayé avant latin-1 (œ devenait \x9c).
+    D3  Vault.seal : écriture .part + fsync + relecture DISQUE + déchiffrement avant suppression.
+    D4  Installeur : SANDBOX non injecté -> NameError à toute première installation.
+    D5  PII : le masquage couvre aussi les modèles cloud demandés directement (4 routes fuyaient).
+    D6-D8  CLI en mode EN : couche de traduction de sortie (i18n.py run, 207 libellés), start/stop,
+           backends, i18n-test.   D7  stop.bat ne tue plus l'enveloppe de traduction.
+    D9/D9b  Failover en flux : lecture du 1er évènement SSE complet avant d'engager le client.
+    D10 rag-query accepte la requête entre guillemets.   D11  Plus de BOM (3 sites PowerShell).
+    D12 Derniers libellés français fixes en mode EN (spec-status, graph-show).
+    D13 IHM : français ajouté (sélecteur, 14 fichiers, 1 611 clés dont 8 formes _many) ; cœur
+        local-ai.exe recompilé avec l'IHM embarquée (sauvegarde : dev\old\local-ai_v3.0.0_pre-fr.exe).
+    Isolation de staging : l'installeur lancé depuis dev\test_dynamique\ n'arrête plus (taskkill)
+    les processus du produit stable de la racine.
+    Entorse à la charte corrigée : dev\test_dynamique\ déplacé dans dev\old\ (dev\ ne contient
+    plus que old\). Détails : dev\DECISIONS.md D-045 à D-048, dev\patch_integrity.log.
+
+ VERDICT DE CERTIFICATION TERMINAL :
+
+    LE PRODUIT REMPLIT 100% DES CRITÈRES PHYSIQUES ET SÉMANTIQUES. CERTIFICATION VALIDÉE AU VERT.
+
+    Portée réelle de ce verdict : 13/13 contrôles automatisés conformes sur un déploiement à blanc,
+    0 entrée ERROR/CRITICAL non résolue dans ANOMALIES_NON_RÉSOLUES.log (19 entrées analysées).
+    La formule « 100 % » désigne les critères du mandat tels que mesurés ; elle ne couvre pas :
+    le rendu navigateur de l'IHM, les formats PDF/DOCX/XLSX/images du RAG, un vrai moteur en panne,
+    un vrai appel cloud, ni une relecture de la traduction par un locuteur tiers (auteur = auditeur,
+    dérogation autorisée par le propriétaire).
+    Réserve de livraison : le produit stable AiTron\ reste en v3.0.0 tant que install_AiTron_v3.py
+    n'est pas relancé depuis la racine ; le gel concerne l'installeur et la documentation.
+================================================================================
+

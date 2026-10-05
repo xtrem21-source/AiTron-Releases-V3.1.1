@@ -1,0 +1,84 @@
+{
+  "version": "3.1.0",
+  "frozen_at": "20261004_035530",
+  "verdict": "CERTIFICATION VALIDEE AU VERT",
+  "blackbox": "install_AiTron_v3_20261004_034147.py.txt",
+  "note": "gel = lecture seule + empreintes ; reversible : python build\\audit\\freeze.py --unfreeze",
+  "files": [
+    {
+      "file": "install_AiTron_v3.py",
+      "bytes": 353331,
+      "sha256": "7e39687c16e1ed28aeeb766bf2a88acd1ceed183c7517e72f4d2d179f3e8bd10"
+    },
+    {
+      "file": "CHECK_DE_CONTRÔLE_FINAL.log",
+      "bytes": 6732,
+      "sha256": "b6bd249bb599a644ace76b438a02885a6f709bfa39b4bd37c8dd1c1342145a13"
+    },
+    {
+      "file": "ANOMALIES_NON_RÉSOLUES.log",
+      "bytes": 11250,
+      "sha256": "dbfdc2e3132982df857f7ddcfaab488ce6102f22425e228d29d302f44151ff40"
+    },
+    {
+      "file": "CHARTE.md",
+      "bytes": 13845,
+      "sha256": "cd362f7407f728b042d92d351ca8e2f709aa66d916d21d027aa615e6961dbbc0"
+    },
+    {
+      "file": "PERIMETRE.md",
+      "bytes": 9165,
+      "sha256": "cf6dcbdf477c63c2fc30da7373a18cb91dc77d852da2a7f5fb3b4284cdbfd419"
+    },
+    {
+      "file": "JOURNAL.md",
+      "bytes": 30092,
+      "sha256": "c130e8d82b0a3f421de9b382277f2f67dfe3dfd902e7121bca15b8212a80e3d0"
+    },
+    {
+      "file": "INSTALLATION.md",
+      "bytes": 6192,
+      "sha256": "40aaabd1f614b4395c7200a7afb6a31eda2f6334001f67eedc755067e3bf4883"
+    },
+    {
+      "file": "INSTALLATION.fr.md",
+      "bytes": 57860,
+      "sha256": "9e4e9fdff8b51d5d7e361909f7e7fb3a0a889661251b846f5338732b31e7278f"
+    },
+    {
+      "file": "INSTALLATION.en.md",
+      "bytes": 9586,
+      "sha256": "6f984751c2ce14711010c2510c7fa28328c55f958ba8f6ba8e06c56ef3067d65"
+    },
+    {
+      "file": "dev\\CHANGELOG.md",
+      "bytes": 31531,
+      "sha256": "e38e8d22494a599fe06393b9099a069e58a63314dd9bc2537745e33731409bb3"
+    },
+    {
+      "file": "dev\\DECISIONS.md",
+      "bytes": 61313,
+      "sha256": "d58af3ecb9573de63659372b55b47be2e344930c6aaf8b1ce015bce58a462b71"
+    },
+    {
+      "file": "dev\\patch_integrity.log",
+      "bytes": 77943,
+      "sha256": "9e579c24fb9555d8c259f10f5aa650daf32cbbc85cdd191c79fc83f0354a0dfe"
+    },
+    {
+      "file": "dev\\BETA_TEST_REPORT.md",
+      "bytes": 44579,
+      "sha256": "72cf209983bee80c043479e3c8551cb78b538ac1022e92ea7af265246a21900d"
+    },
+    {
+      "file": "dev\\check_terminal_encoding.py",
+      "bytes": 1339,
+      "sha256": "c7a120bca25d66432e7b8b55d7217d37e3946f8c560cc761fd60ff8f3361bcb1"
+    },
+    {
+      "file": "dev\\test_rag_stress.py",
+      "bytes": 2691,
+      "sha256": "e6b69976d8efaab6eb66546df2b47113a884f38e3de54bdfc4579f6b47ad607b"
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1036{\fonttbl{\f0\fnil\fcharset0 Calibri;}{\f1\fnil Calibri;}{\f2\fnil\fcharset238 Calibri;}}
+{\*\generator Riched20 10.0.29639}\viewkind4\uc1 
+\pard\sa200\sl276\slmult1\f0\fs22\lang12 # MANDAT TECHNIQUE ET DIRECTIVE D'AUDIT S\'c9MANTIQUE PRO \f1\emdash  VERSION v3.1.0\par
+## Certificat de Conformit\f0\'e9, Validation IHM Bilingue & Inf\'e9rence Physique Flanc GPU\par
+**Mod\'e8le requis :** Mod\'e8le d'inf\'e9rence Pro \'e0 grand contexte (DeepSeek V4 Pro, stealth/ox-alpha, Claude 3.5 Sonnet ou \'e9quivalent). **Interdiction formelle d'utiliser un mod\'e8le de classe 'Flash' pour cet audit.**\par
+**Sandbox cible :** `G:\\V1\\LocalAI-Projet\\`  \par
+**Version d'origine :** v3.0.0 | **Version cible :** v3.1.0 (Incr\'e9ment d'Audit et de Certification)\par
+\par
+Bonjour Cline. L'infrastructure v3.0.0 d'AiTron V3 a \'e9t\'e9 d\'e9ploy\'e9e et reconstruite \'e0 blanc. Tu as maintenant l'ORDRE STRICT d'endosser le r\'f4le de Super-Auditeur QA Pro en conditions physiques r\'e9elles, avec mandat d'Auto-R\'e9paration dynamique.\par
+\par
+Ce mandat ne tol\'e8re aucune approximation th\'e9orique : tu dois simuler, inspecter et \'e9prouver l'ensemble du produit du point de vue d'un utilisateur humain naviguant dans l'\'e9cosyst\'e8me.\par
+\par
+================================================================================\par
+ PROTOCOLE TRANSACTIONNEL INITIAL\par
+================================================================================\par
+1. **SAUVEGARDE ANTE-EX\'c9CUTION :** Appelle la routine `archive_installer()` pour copier `install_AiTron_v3.py` dans `Installeur\\`.\par
+2. **VERSIONNAGE :** Passe la version globale du script ma\'eetre et du manifest \'e0 "v3.1.0".\par
+\par
+================================================================================\par
+SECTION 1 \f1\emdash  INSPECTION CHIRURGICALE DE L'IHM, DU COMMAND CLI ET DES LANGUES\par
+================================================================================\par
+Tu dois analyser minutieusement le comportement du syst\f0\'e8me lors de ses interactions :\par
+\par
+1. **AUDIT DE L'IHM WEB EMBARQU\'c9E (EMBEDDEDUI) :** Inspecte les templates HTML/JS/React de ton interface pour t'assurer qu'aucun libell\'e9, bouton ou message d'erreur n'est rest\'e9 fig\'e9 en anglais (sauf en mode EN). V\'e9rifie la traduction et le comportement des boutons critiques : "Lancer le serveur", "Interagir", "Arr\'eater", "Model Manager". L'interface doit \'eatre bilingue \'e0 chaud, fluide et ergonomique.\par
+2. **AUDIT DE LA CONSOLE ET ENCODAGE (.BAT) :** Ex\'e9cute le script `dev\\check_terminal_encoding.py`. V\'e9rifie que l'ex\'e9cution de `Run-LocalAI.bat lang fr` et `lang en` bascule instantan\'e9ment la totalit\'e9 des messages du terminal au pixel pr\'e8s. Gr\'e2ce \'e0 la commande `chcp 65001`, assure-toi qu'aucun accent n'est corrompu (z\'e9ro caract\'e8re bris\'e9 \'e0 l'affichage).\par
+3. **AUDIT DE L'ACC\'c9L\'c9RATEUR S\'c9MANTIQUE (DIRECTML) :** Simule ou ex\'e9cute `Run-LocalAI.bat npu-probe` et `hardware-status`. Inspecte l'en-t\'eate de journalisation pour v\'e9rifier qu'en cas d'\'e9chec d'initialisation DirectML, la bascule sur CPU se fait de mani\'e8re transparente sans casser l'exp\'e9rience utilisateur, et que l'alerte est correctement cat\'e9goris\'e9e sous `GPU_DETECT` dans `dev\\crash.log`.\par
+\par
+================================================================================\par
+SECTION 2 \f1\emdash  EXTRACTION ET V\f0\'c9RIFICATION PHYSIQUE DES MODALIT\'c9S (RAG & FAILOVER)\par
+================================================================================\par
+1. **TEST PHYSIQUE DU PIPELINE RAG :** Ex\'e9cute le script de stress-test `dev\\test_rag_stress.py`. Assure-toi que les fonctions de lecture NumPy et de similarit\'e9 cosinus n'ont pas d'angles morts sur les caract\'e8res sp\'e9ciaux, les ligatures (c\f2\u339?ur, \u339?il) ou les structures complexes de documents.\par
+2. **V\f0\'c9RIFICATION DE L'INT\'c9GRIT\'c9 BINAIRE (ANTI-BOM) :** Inspecte le pipeline d'\'e9criture des fichiers de commandes du moteur (`llama-cmd.json`). V\'e9rifie qu'aucun octet parasite (BOM UTF-8) n'est introduit lors de la s\'e9rialisation, ce qui ferait \'e9chouer le parsing JSON des actions correctives.\par
+3. **\'c9TANCH\'c9IT\'c9 DU REPLAY SSE :** Audite minutieusement le code de ton proxy de bufferisation (`failover_proxy.py`). Assure-toi qu'en cas de crash simul\'e9 d'un moteur, le relais vers le cloud s'effectue sans aucune duplication de tokens \'e0 l'\'e9cran.\par
+4. **\'c9TANCH\'c9IT\'c9 DU FILTRE PII (BEST-EFFORT) :** Simule l'envoi d'une requ\'eate complexe contenant des variables sensibles vers la route Cloud (`openrouter-claude`). V\'e9rifie que le masquage r\'e9versible s'active *uniquement* lorsque le contenu quitte la machine, et que les journaux d'audit de masquage sont bien consign\'e9s dans `dev\\crash.log`, cat\'e9gorie `PRIVACY_FILTER`.\par
+5. **AUDIT DE L'ESPACE HERM\'c9TIQUE (VAULT) :** Inspecte le script `vault.py`. Assure-toi que la routine `seal` applique l'anti-perte structurelle en v\'e9rifiant la r\'e9versibilit\'e9 compl\'e8te du conteneur chiffr\'e9 AES-256-GCM avant de supprimer les fichiers en clair du disque.\par
+\par
+================================================================================\par
+SECTION 3 \f1\emdash  HI\f0\'c9RARCHIE DES LIVRABLES ET PROTOCOLE DE SORTIE\par
+================================================================================\par
+En fin d'ex\'e9cution, tu dois produire l'arborescence documentaire r\'e9glementaire suivante :\par
+\par
+### 1. LIVRABLE MA\'ceTRE ET CERTIFICAT DE S\'c9CURIT\'c9 (\'c0 la racine)\par
+G\'e9n\'e8re le fichier de certification nomm\'e9 exactement : `G:\\V1\\LocalAI-Projet\\CHECK_DE_CONTR\'d4LE_FINAL.log`\par
+```text\par
+================================================================================\par
+               AITRON V3 \f1\emdash  RAPPORT D'AUDIT ET DE CONTR\f0\'d4LE FINAL\par
+================================================================================\par
+Date : [AAAAMMJJ_HHMMSS] | Validateur : Cline (Moteur S\'e9mantique Pro)\par
+Version certifi\'e9e : v3.1.0 | Sandbox : G:\\V1\\LocalAI-Projet\\\par
+ CONTR\'d4LE DE L'IHM ET DU BILINGUISME (FR/EN) :\par
+    - \'c9tat de la traduction des boutons ("Interagir", etc.) : [CONFORME/ANOMALIE]\par
+    - Comportement de la bascule \'e0 chaud via CLI : [CONFORME/ANOMALIE]\par
+    - Statut de l'encodage des accents console (chcp 65001) : [CONFORME/ANOMALIE]\par
+    - Comportement du repli CPU sur l'acc\'e9l\'e9rateur ONNX : [CONFORME/ANOMALIE]\par
+ CONTR\'d4LE DE L'AUTONOMIE ET DES PIPELINES :\par
+    - Int\'e9grit\'e9 de l'extraction multi-format NumPy (RAG) : [CONFORME/ANOMALIE]\par
+    - Int\'e9grit\'e9 de l'\'e9criture des commandes JSON (Anti-BOM) : [CONFORME/ANOMALIE]\par
+    - Fluidit\'e9 de la bufferisation du proxy et du Failover SSE : [CONFORME/ANOMALIE]\par
+    - \'c9tanch\'e9it\'e9 du masquage et de l'anonymisation Cloud (PII) : [CONFORME/ANOMALIE]\par
+    - Fiabilit\'e9 de l'anti-perte de la zone herm\'e9tique (Vault) : [CONFORME/ANOMALIE]\par
+    - \'c9tat des processus orphelins \'e0 l'arr\'eat (z\'e9ro zombie) : [CONFORME/ANOMALIE]\par
+ SYNTH\'c8SE DES AM\'c9LIORATIONS APPORT\'c9ES PAR AUTO-HEALING :\par
+    (Liste ici chaque micro-ajustement ergonomique, correctif de code ou de traduction appliqu\'e9 durant la boucle d'auto-r\'e9paration)\par
+ VERDICT DE CERTIFICATION TERMINAL :\par
+    [INSCRIRE L'UN DES DEUX BLOCS SELON LES R\'c9SULTATS FINAUX :]\par
+    \par
+    >>> EN CAS DE SUCC\'c8S (INITIAL OU APR\'c8S AUTO-R\'c9PARATION EFFECTIVE) :\par
+    LE PRODUIT REMPLIT 100% DES CRIT\'c8RES PHYSIQUES ET S\'c9MANTIQUES. CERTIFICATION VALID\'c9E AU VERT.\par
+    \par
+    >>> EN CAS D'ANOMALIE INCURABLE MALGR\'c9 LA BOUCLE D'AUTO-R\'c9PARATION :\par
+    CERTIFICATION REFUS\'c9E. LISTE DES ANOMALIES BLOQUANTES CI-DESSOUS. LE PRODUIT NE PEUT PAS \'caTRE CERTIFI\'c9 TANT QUE CES ANOMALIES NE SONT PAS CORRIG\'c9ES.\par
+================================================================================\par
+```\par
+\par
+### 2. LE JOURNAL DES D\'c9FAILLANCES HISTORIQUES OU R\'c9SIDUELLES (\'c0 la racine)\par
+Si des anomalies ont \'e9t\'e9 d\'e9tect\'e9es (qu'elles aient \'e9t\'e9 r\'e9par\'e9es par auto-healing ou qu'elles soient rest\'e9es incurables), consigne-les obligatoirement dans : `G:\\V1\\LocalAI-Projet\\ANOMALIES_NON_R\'c9SOLUES.log`\par
+Chaque entr\'e9e doit respecter le format s\'e9mantique standardis\'e9 h\'e9rit\'e9 :\par
+```text\par
+[AAAAMMJJ_HHMMSS] [CATEGORIE] [SEVERITE] Description\par
+Impact : ...\par
+Contournement : ...\par
+Recommandation / Action corrective appliqu\'e9e : ...\par
+Statut : [R\'c9SOLU PAR AUTO-HEALING / SANS SOLUTION R\'c9SIDUELLE]\par
+---\par
+```\par
+*(S\'e9vrit\'e9s accept\'e9es : CRITICAL, ERROR, WARN, INFO. Tout statut 'SANS SOLUTION R\'c9SIDUELLE' de niveau ERROR ou CRITICAL entra\'eene le refus imm\'e9diat du certificat VERT).*\par
+\par
+### 3. TRA\'c7ABILIT\'c9 ET COMPTABILIT\'c9 HISTORIQUE (Dans dev\\)\par
+Mets \'e0 jour les fichiers de registre habituels : `dev\\CHANGELOG.md` (v3.1.0), `dev\\patch_integrity.log` et `dev\\BETA_TEST_REPORT.md` pour refl\'e9ter ton passage, tes actions de r\'e9paration et ton verdict final.\par
+\par
+Fige d\'e9finitivement le produit une fois ces fichiers \'e9crits. Le chantier est clos. Tu peux commencer.\par
+\par
+================================================================================\par
+ PROTOCOLE D'AUTO-R\'c9PARATION APPLICATIVE (AUTO-HEALING LOOP)\par
+================================================================================\par
+**Tu as l'AUTORISATION EXPLICITE ET L'ORDRE de modifier le code si et seulement si tu d\'e9tectes une anomalie ou un d\'e9faut de conformit\'e9 lors de ton audit.**\par
+* **\'c9tape A (D\'e9tection) :** Si une anomalie (caract\'e8re bris\'e9, libell\'e9 anglais, mauvaise route, plantage de script) appara\'eet, interromps l'audit.\par
+* **\'c9tape B (R\'e9paration) :** Modifie le code source concern\'e9 (dans l'installeur ma\'eetre ou le script incrimin\'e9) pour corriger l'anomalie de mani\'e8re d\'e9finitive.\par
+* **\'c9tape C (Triple Validation AST) :** Relance la validation AST compl\'e8te sur le code modifi\'e9 pour t'assurer qu'aucune r\'e9gression syntaxique n'a \'e9t\'e9 introduite.\par
+* **\'c9tape D (Re-Test complet) :** R\'e9initialise l'environnement de test et **relance l'int\'e9gralit\'e9 du processus d'audit de z\'e9ro**.\par
+* **It\'e9ration :** Tu r\'e9p\'e9teras ce cycle d'auto-r\'e9paration jusqu'\'e0 obtenir un parcours d'audit physique 100 % vierge de tout d\'e9faut.\par
+}
+ 

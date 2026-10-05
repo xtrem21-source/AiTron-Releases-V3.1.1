@@ -1,0 +1,666 @@
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1036{\fonttbl{\f0\fnil\fcharset0 Calibri;}{\f1\fnil Calibri;}{\f2\fnil\fcharset1 Cambria Math;}{\f3\fnil\fcharset1 Segoe UI Symbol;}{\f4\fnil\fcharset1 Segoe UI Symbol;}{\f5\fnil\fcharset238 Calibri;}}
+{\colortbl ;\red0\green0\blue255;}
+{\*\generator Riched20 10.0.29639}{\*\mmathPr\mmathFont2\mwrapIndent1440 }\viewkind4\uc1 
+\pard\sa200\sl276\slmult1\f0\fs22\lang12 M\'c9THODE-LOCALAI-WINDOWS-v1.2.0.md\par
+MANDAT D'\'c9VOLUTION \f1\emdash  PHASE 2\par
+Projet : Portage Windows natif et autonome de LocalAI\par
+Version cible : v1.2.0 (incr\f0\'e9ment de la v1.1.0)\par
+Sandbox : G:\\V1\\LocalAI-Projet\\\par
+Pr\'e9requis : Phase 1 (v1.1.0) termin\'e9e et valid\'e9e\par
+PR\'c9REQUIS \f1\emdash  LA PHASE 1 EST TERMIN\f0\'c9E\par
+Tu as d\'e9j\'e0 livr\'e9 la v1.1.0 du portage LocalAI Windows (Phase 1). Cette v1.1.0 a produit :\par
+\par
+install_localai_win.py (script ma\'eetre v1.1.0)\par
+\par
+LocalAI\\ (arborescence d\'e9ploy\'e9e : local-ai.exe, cloud-proxy.exe, llama-server.exe, models\\, config\\, launcher.bat, stop.bat, download_model.bat, manifest.json)\par
+\par
+CHARTE.md (charte fondamentale)\par
+\par
+PERIMETRE.md, JOURNAL.md, INSTALLATION.md\par
+\par
+Toute la tra\'e7abilit\'e9 (dev\\CHANGELOG.md, dev\\DECISIONS.md, dev\\patch_integrity.log, log\\)\par
+\par
+Architecture v1.1.0 en place :\par
+\par
+text\par
+client OpenAI \f2\u8594?\f0  local-ai.exe (:8080) \f2\u8594?\f0  cloud-proxy.exe (gRPC) \f2\u8594?\f0  llama-server.exe (:8090) \f2\u8594?\f0  *.gguf\par
+Ce mandat est la Phase 2. Tu vas faire \'e9voluer cet existant vers la v1.2.0, en respectant int\'e9gralement la doctrine transactionnelle de la charte (sauvegarde ante-ex\'e9cution, bo\'eete noire Installeur\\, validation AST triple, rollback).\par
+\par
+Tu n'\'e9crases rien. Tu INCR\'c9MENTES.\par
+\par
+R\'d4LE ET MANDAT\par
+Tu es Ing\'e9nieur principal en Assurance Qualit\'e9 (QA) global, Expert en S\'e9curit\'e9 Syst\'e8me/Web et D\'e9veloppeur Senior Full-Stack. Ce fichier est un mandat d'\'e9volution qui s'ajoute \'e0 la charte fondamentale CHARTE.md (d\'e9j\'e0 en vigueur dans la sandbox).\par
+\par
+Rappel de la doctrine : on n'\'e9crase jamais l'acquis stable. On INCR\'c9MENTE. La v1.1.0 est ta base. Tu vas la faire \'e9voluer vers la v1.2.0 en greffant les fonctions d\'e9crites ci-dessous, sans jamais casser ce qui fonctionne d\'e9j\'e0.\par
+\par
+\f3\u-10179?\u-9023?\f0  RAPPEL DU P\'c9RIM\'c8TRE\par
+Ton espace de travail reste G:\\V1\\LocalAI-Projet\\. Tu ne sors jamais de ce r\'e9pertoire.\par
+\par
+Structure cible apr\'e8s Phase 2 :\par
+\par
+text\par
+G:\\V1\\LocalAI-Projet\\\par
+\f4\u9500?\u9472?\u9472?\f0  CHARTE.md                    \f2\u8592?\f0  La charte fondamentale\par
+\f4\u9500?\u9472?\u9472?\f0  install_localai_win.py       \f2\u8592?\f0  L'installeur ma\'eetre (\'e0 faire \'e9voluer \f2\u8594?\f0  v1.2.0)\par
+\f4\u9500?\u9472?\u9472?\f0  PERIMETRE.md                 \f2\u8592?\f0  Contrat de confinement\par
+\f4\u9500?\u9472?\u9472?\f0  JOURNAL.md                   \f2\u8592?\f0  Journal narratif\par
+\f4\u9500?\u9472?\u9472?\f0  INSTALLATION.md              \f2\u8592?\f0  Documentation utilisateur (\'e0 enrichir)\par
+\f4\u9500?\u9472?\u9472?\f0  Installeur\\                  \f2\u8592?\f0  Bo\'eete noire (versions ant\'e9rieures)\par
+\f4\u9500?\u9472?\u9472?\f0  dev\\\par
+\f4\u9474?\f0    \f4\u9500?\u9472?\u9472?\f0  CHANGELOG.md             \f2\u8592?\f0  \'c0 incr\'e9menter (v1.2.0)\par
+\f4\u9474?\f0    \f4\u9500?\u9472?\u9472?\f0  DECISIONS.md             \f2\u8592?\f0  \'c0 enrichir\par
+\f4\u9474?\f0    \f4\u9500?\u9472?\u9472?\f0  patch_integrity.log      \f2\u8592?\f0  \'c0 enrichir\par
+\f4\u9474?\f0    \f4\u9500?\u9472?\u9472?\f0  crash.log                \f2\u8592?\f0  NOUVEAU : log de crash\par
+\f4\u9474?\f0    \f4\u9500?\u9472?\u9472?\f0  BETA_TEST_REPORT.md      \f2\u8592?\f0  NOUVEAU : rapport final b\'eata-test\par
+\f4\u9474?\f0    \f4\u9492?\u9472?\u9472?\f0  old\\\par
+\f4\u9500?\u9472?\u9472?\f0  log\\\par
+\f4\u9500?\u9472?\u9472?\f0  build\\                       \f2\u8592?\f0  Toolchain Go/Node/protoc, sources, caches\par
+\f4\u9492?\u9472?\u9472?\f0  LocalAI\\                     \f2\u8592?\f0  Produit d\'e9ploy\'e9 (v1.1.0 \f2\u8594?\f0  v1.2.0)\par
+    \f4\u9500?\u9472?\u9472?\f0  local-ai.exe\par
+    \f4\u9500?\u9472?\u9472?\f0  backends\\\par
+    \f4\u9474?\f0    \f4\u9500?\u9472?\u9472?\f0  llama-cpp\\           \f2\u8592?\f0  Existant (llama-server + cloud-proxy)\par
+    \f4\u9474?\f0    \f4\u9500?\u9472?\u9472?\f0  whisper-cpp\\         \f2\u8592?\f0  NOUVEAU\par
+    \f4\u9474?\f0    \f4\u9500?\u9472?\u9472?\f0  stable-diffusion\\    \f2\u8592?\f0  NOUVEAU\par
+    \f4\u9474?\f0    \f4\u9492?\u9472?\u9472?\f0  tts\\                 \f2\u8592?\f0  NOUVEAU\par
+    \f4\u9500?\u9472?\u9472?\f0  models\\\par
+    \f4\u9474?\f0    \f4\u9492?\u9472?\u9472?\f0  models-catalog.json  \f2\u8592?\f0  NOUVEAU : catalogue multi-modal\par
+    \f4\u9500?\u9472?\u9472?\f0  runtime\\\par
+    \f4\u9474?\f0    \f4\u9492?\u9472?\u9472?\f0  python\\              \f2\u8592?\f0  NOUVEAU : Python embarqu\'e9 (LiteLLM)\par
+    \f4\u9500?\u9472?\u9472?\f0  config\\\par
+    \f4\u9474?\f0    \f4\u9500?\u9472?\u9472?\f0  litellm-config.yaml  \f2\u8592?\f0  NOUVEAU\par
+    \f4\u9474?\f0    \f4\u9492?\u9472?\u9472?\f0  cloud-keys.env       \f2\u8592?\f0  NOUVEAU (non versionn\'e9)\par
+    \f4\u9500?\u9472?\u9472?\f0  logs\\\par
+    \f4\u9500?\u9472?\u9472?\f0  Run-LocalAI.bat          \f2\u8592?\f0  NOUVEAU : lanceur principal\par
+    \f4\u9500?\u9472?\u9472?\f0  launcher.bat             \f2\u8592?\f0  Conserv\'e9 (compatibilit\'e9)\par
+    \f4\u9500?\u9472?\u9472?\f0  stop.bat                 \f2\u8592?\f0  \'c0 enrichir (arr\'eat de tous les services)\par
+    \f4\u9500?\u9472?\u9472?\f0  download_model.bat       \f2\u8592?\f0  \'c0 enrichir (multi-modal)\par
+    \f4\u9492?\u9472?\u9472?\f0  manifest.json\par
+SECTION 1 \f1\emdash  PROTOCOLE TRANSACTIONNEL (RAPPEL)\par
+Le cycle de vie de toute modification reste inchang\f0\'e9 :\par
+\par
+text\par
+SAUVEGARDE ANTE-EX\'c9CUTION \f2\u8594?\f0  PATCH CHIRURGICAL \f2\u8594?\f0  COMPILATION / TEST \f2\u8594?\f0  VALIDATION RATIFI\'c9E\par
+Rappels critiques :\par
+\par
+archive_installer() reste la premi\'e8re instruction de main()\par
+\par
+La bo\'eete noire Installeur\\ archive le script ma\'eetre \'e0 chaque ex\'e9cution\par
+\par
+La validation AST triple reste obligatoire avant \'e9criture disque\par
+\par
+Le versionnage passe de v1.1.0 \'e0 v1.2.0 (incr\'e9ment strict)\par
+\par
+SECTION 2 \f1\emdash  OBJECTIF DE L'\f0\'c9VOLUTION v1.2.0\par
+Faire \'e9voluer le portage LocalAI Windows de la v1.1.0 vers la v1.2.0 en ajoutant :\par
+\par
+Python embarqu\'e9 (uniquement pour LiteLLM) \f1\emdash  LocalAI\\runtime\\python\\\par
+\par
+Routage LiteLLM (port 4000) \emdash  local/externe avec BYOK\par
+\par
+Backends multi-modaux (services HTTP s\f0\'e9par\'e9s) :\par
+\par
+whisper.cpp (speech-to-text) \f1\emdash  port 8091\par
+\par
+stable-diffusion.cpp (images) \emdash  port 8092\par
+\par
+kokoro (text-to-speech) \emdash  port 8093\par
+\par
+Model Manager : catalogue JSON multi-modal\par
+\par
+CLI wrapper : Run-LocalAI.bat orchestrant tous les services\par
+\par
+Cloud Offload : routage vers APIs externes (OpenRouter, OpenAI, Anthropic)\par
+\par
+Documentation multi-modale : INSTALLATION.md enrichi\par
+\par
+SECTION 3 \emdash  PYTHON EMBARQU\f0\'c9 (UNIQUEMENT POUR LITELLM)\par
+3.1 D\'e9cision architecturale\par
+Pourquoi Python embarqu\'e9 ?\par
+\par
+Coh\'e9rence avec la doctrine "Click and Go" : l'utilisateur ne doit rien installer\par
+\par
+Reproductibilit\'e9 : version Python fig\'e9e\par
+\par
+Isolation : Python ne sert que \'e0 LiteLLM, il ne touche pas au c\f5\u339?ur Go\par
+\par
+Pourquoi pas tout en Python ?\par
+\par
+Le c\u339?ur LocalAI (local-ai.exe) et le bridge (cloud-proxy.exe) sont compil\f0\'e9s en Go \f1\emdash  performants, autonomes, sans d\f0\'e9pendance\par
+\par
+Les passer en Python d\'e9graderait les performances et introduirait de la fragilit\'e9\par
+\par
+Les backends multi-modaux sont des binaires natifs (whisper.cpp, SD, kokoro)\par
+\par
+3.2 Version Python fig\'e9e\par
+Version cible : Python 3.11.9 (embed amd64)\par
+\par
+Source : {{\field{\*\fldinst{HYPERLINK https://www.python.org/ftp/python/3.11.9/python-3.11.9-embed-amd64.zip }}{\fldrslt{https://www.python.org/ftp/python/3.11.9/python-3.11.9-embed-amd64.zip\ul0\cf0}}}}\f0\fs22\par
+\par
+Liste de repli : 3.11.8, 3.12.4\par
+\par
+Hash SHA-256 : \'e0 calculer lors du premier t\'e9l\'e9chargement r\'e9ussi, puis fig\'e9\par
+\par
+Constante dans install_localai_win.py :\par
+\par
+python\par
+PYTHON_EMBED_RELEASES = ["3.11.9", "3.11.8", "3.12.4"]\par
+PYTHON_EMBED_URL = "{{\field{\*\fldinst{HYPERLINK https://www.python.org/ftp/python/\{version\}/python-\{version\}-embed-amd64.zip }}{\fldrslt{https://www.python.org/ftp/python/\{version\}/python-\{version\}-embed-amd64.zip\ul0\cf0}}}}\f0\fs22 "\par
+3.3 Installation de LiteLLM\par
+Apr\'e8s extraction du Python embarqu\'e9 dans LocalAI\\runtime\\python\\ :\par
+\par
+Activer site-packages dans python311._pth\par
+\par
+Installer pip via get-pip.py\par
+\par
+Installer litellm[proxy] via pip install --target LocalAI\\runtime\\python\\Lib\\site-packages litellm[proxy]\par
+\par
+D\'e9pendances \'e0 figer : litellm==1.94.x (version stable la plus r\'e9cente au moment de l'ex\'e9cution)\par
+\par
+3.4 V\'e9rification\par
+LocalAI\\runtime\\python\\python.exe --version \f2\u8594?\f0  doit afficher Python 3.11.9\par
+\par
+LocalAI\\runtime\\python\\python.exe -m litellm --version \f2\u8594?\f0  doit afficher la version LiteLLM\par
+\par
+Test : lancer LiteLLM sur un port libre et v\'e9rifier qu'il r\'e9pond\par
+\par
+SECTION 4 \f1\emdash  ROUTAGE LITELLM (PORT 4000)\par
+4.1 Port d'\f0\'e9coute\par
+LiteLLM \'e9coute sur le port 4000 (d\'e9faut officiel).\par
+\par
+Architecture cible :\par
+\par
+Composant\tab Port\tab R\'f4le\par
+LocalAI (local-ai.exe)\tab 8080\tab API OpenAI-compatible\par
+llama-server (moteur)\tab 8090\tab Inf\'e9rence texte\par
+whisper-server\tab 8091\tab Speech-to-text\par
+stable-diffusion\tab 8092\tab G\'e9n\'e9ration d'images\par
+kokoro TTS\tab 8093\tab Text-to-speech\par
+LiteLLM Proxy\tab 4000\tab Gateway de routage unifi\'e9\par
+D\'e9tection de conflit : si le port 4000 est occup\'e9, proposer 4001, 4002...\par
+\par
+4.2 Configuration type\par
+LocalAI\\config\\litellm-config.yaml :\par
+\par
+yaml\par
+model_list:\par
+  - model_name: local-llama\par
+    litellm_params:\par
+      model: openai/local\par
+      api_base: {{\field{\*\fldinst{HYPERLINK http://127.0.0.1:8080/v1 }}{\fldrslt{http://127.0.0.1:8080/v1\ul0\cf0}}}}\f0\fs22\par
+      api_key: "sk-local"\par
+\par
+  - model_name: openrouter-claude\par
+    litellm_params:\par
+      model: openrouter/anthropic/claude-3.5-sonnet\par
+      api_key: os.environ/OPENROUTER_API_KEY\par
+\par
+router_settings:\par
+  routing_strategy: complexity-based\par
+  tiers:\par
+    SIMPLE:\par
+      models: [local-llama]\par
+    COMPLEX:\par
+      models: [openrouter-claude]\par
+4.3 R\'e8gles de routage (Token Saver g\'e9n\'e9rique)\par
+Reproduire le comportement du Token Saver original :\par
+\par
+Requ\'eates courtes (< 3 mots) \f2\u8594?\f0  tier SIMPLE \f2\u8594?\f0  mod\'e8le local\par
+\par
+Requ\'eates complexes \f2\u8594?\f0  tier COMPLEX \f2\u8594?\f0  mod\'e8le externe (si cl\'e9 API configur\'e9e)\par
+\par
+4.4 Int\'e9gration avec Run-LocalAI.bat\par
+Run-LocalAI.bat doit :\par
+\par
+D\'e9marrer llama-server.exe (port 8090)\par
+\par
+D\'e9marrer whisper-server.exe (port 8091) si pr\'e9sent\par
+\par
+D\'e9marrer sd.exe (port 8092) si pr\'e9sent\par
+\par
+D\'e9marrer kokoro (port 8093) si pr\'e9sent\par
+\par
+Attendre que les ports r\'e9pondent\par
+\par
+D\'e9marrer local-ai.exe (port 8080)\par
+\par
+D\'e9marrer LiteLLM sur le port 4000\par
+\par
+Afficher l'URL finale : {{\field{\*\fldinst{HYPERLINK http://127.0.0.1:4000 }}{\fldrslt{http://127.0.0.1:4000\ul0\cf0}}}}\f0\fs22\par
+\par
+SECTION 5 \f1\emdash  BACKENDS MULTI-MODAUX (SERVICES HTTP S\f0\'c9PAR\'c9S)\par
+5.1 D\'e9cision architecturale\par
+Pourquoi des services HTTP s\'e9par\'e9s ?\par
+\par
+Simplicit\'e9 : chaque backend est isol\'e9, autonome\par
+\par
+Stabilit\'e9 : un crash de whisper ne tue pas stable-diffusion\par
+\par
+Coh\'e9rence : Cline a d\'e9j\'e0 prouv\'e9 ce pattern avec cloud-proxy.exe \f2\u8594?\f0  llama-server.exe\par
+\par
+Pas de recompilation Go n\'e9cessaire\par
+\par
+5.2 Versions fig\'e9es\par
+Backend\tab Version cible\tab Liste de repli\tab Port\par
+whisper.cpp\tab v1.9.2\tab v1.9.1, v1.9.0\tab 8091\par
+stable-diffusion.cpp\tab master-latest\tab master-previous, master-stable\tab 8092\par
+kokoro-onnx\tab model-files-v1.1\tab model-files-v1.0\tab 8093\par
+Constantes :\par
+\par
+python\par
+WHISPER_CPP_RELEASES = ["v1.9.2", "v1.9.1", "v1.9.0"]\par
+STABLE_DIFFUSION_RELEASES = ["master-latest", "master-previous", "master-stable"]\par
+KOKORO_RELEASES = ["model-files-v1.1", "model-files-v1.0"]\par
+5.3 Backend speech-to-text (whisper.cpp)\par
+Source : {{\field{\*\fldinst{HYPERLINK https://github.com/ggml-org/whisper.cpp/releases }}{\fldrslt{https://github.com/ggml-org/whisper.cpp/releases\ul0\cf0}}}}\f0\fs22\par
+\par
+Cible : LocalAI\\backends\\whisper-cpp\\\par
+\par
+Fichiers : whisper-server.exe + DLLs\par
+\par
+V\'e9rification : hash SHA-256, test d'ex\'e9cution --help\par
+\par
+Mod\'e8le de test : ggml-base.bin (t\'e9l\'e9charg\'e9 dans LocalAI\\models\\)\par
+\par
+5.4 Backend image generation (stable-diffusion.cpp)\par
+Source : {{\field{\*\fldinst{HYPERLINK https://github.com/leejet/stable-diffusion.cpp/releases }}{\fldrslt{https://github.com/leejet/stable-diffusion.cpp/releases\ul0\cf0}}}}\f0\fs22\par
+\par
+Cible : LocalAI\\backends\\stable-diffusion\\\par
+\par
+Fichiers : sd.exe + DLLs\par
+\par
+V\'e9rification : hash SHA-256, test d'ex\'e9cution --help\par
+\par
+Mod\'e8le de test : SD-Turbo (t\'e9l\'e9charg\'e9 dans LocalAI\\models\\)\par
+\par
+Note : ce backend peut \'eatre lourd (plusieurs Go). Documenter la taille dans INSTALLATION.md.\par
+\par
+5.5 Backend text-to-speech (kokoro)\par
+Source : {{\field{\*\fldinst{HYPERLINK https://github.com/thewh1teagle/kokoro-onnx/releases }}{\fldrslt{https://github.com/thewh1teagle/kokoro-onnx/releases\ul0\cf0}}}}\f0\fs22\par
+\par
+Cible : LocalAI\\backends\\tts\\\par
+\par
+Fichiers : kokoro-v1.1-zh.onnx + voices-v1.1-zh.bin\par
+\par
+V\'e9rification : hash SHA-256\par
+\par
+5.6 Int\'e9gration dans LocalAI\par
+Chaque backend est lanc\'e9 comme service HTTP avec son propre port\par
+\par
+LocalAI route les requ\'eates vers le bon service selon l'endpoint appel\'e9\par
+\par
+Le manifest.json liste chaque backend avec son hash, sa source et son port\par
+\par
+SECTION 6 \f1\emdash  MODEL MANAGER (CATALOGUE JSON)\par
+6.1 Structure du catalogue\par
+Fichier : LocalAI\\models\\models-catalog.json\par
+\par
+json\par
+\{\par
+  "version": "1.0",\par
+  "generated": "2026-10-03T12:00:00Z",\par
+  "models": [\par
+    \{\par
+      "id": "llama-3.2-1b-instruct",\par
+      "name": "Llama 3.2 1B Instruct",\par
+      "modality": "text",\par
+      "format": "gguf",\par
+      "source": "{{\field{\*\fldinst{HYPERLINK https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF }}{\fldrslt{https://huggingface.co/bartowski/Llama-3.2-1B-Instruct-GGUF\ul0\cf0}}}}\f1\fs22 ",\par
+      "size_mb": 770,\par
+      "sha256": "6f85a640a97cf2bf5b8e764087b1e83da0fdb51d7c9fab7d0fece9385611df83",\par
+      "recommended": true\par
+    \},\par
+    \{\par
+      "id": "whisper-base",\par
+      "name": "Whisper Base",\par
+      "modality": "audio",\par
+      "format": "ggml",\par
+      "source": "{{\field{\*\fldinst{HYPERLINK https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin }}{\fldrslt{https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin\ul0\cf0}}}}\f1\fs22 ",\par
+      "size_mb": 142,\par
+      "sha256": "...",\par
+      "recommended": true\par
+    \},\par
+    \{\par
+      "id": "sd-turbo",\par
+      "name": "SD Turbo",\par
+      "modality": "image",\par
+      "format": "safetensors",\par
+      "source": "{{\field{\*\fldinst{HYPERLINK https://huggingface.co/stabilityai/sd-turbo }}{\fldrslt{https://huggingface.co/stabilityai/sd-turbo\ul0\cf0}}}}\f1\fs22 ",\par
+      "size_mb": 5200,\par
+      "sha256": "...",\par
+      "recommended": false\par
+    \},\par
+    \{\par
+      "id": "kokoro-v1.1",\par
+      "name": "Kokoro v1.1 (TTS)",\par
+      "modality": "tts",\par
+      "format": "onnx",\par
+      "source": "{{\field{\*\fldinst{HYPERLINK https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/kokoro-v1.1-zh.onnx }}{\fldrslt{https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.1/kokoro-v1.1-zh.onnx\ul0\cf0}}}}\f1\fs22 ",\par
+      "size_mb": 310,\par
+      "sha256": "...",\par
+      "recommended": true\par
+    \}\par
+  ]\par
+\}\par
+Champs obligatoires : id, name, modality, format, source, size_mb, sha256, recommended\par
+Modalit\f0\'e9s support\'e9es : text, audio, image, tts\par
+\par
+6.2 Script de t\'e9l\'e9chargement enrichi\par
+download_model.bat doit :\par
+\par
+Prendre en argument l'id du mod\'e8le\par
+\par
+Chercher dans le catalogue JSON\par
+\par
+T\'e9l\'e9charger vers LocalAI\\models\\\par
+\par
+V\'e9rifier le SHA-256\par
+\par
+Afficher la progression\par
+\par
+6.3 Documentation\par
+INSTALLATION.md documente :\par
+\par
+Comment lister les mod\'e8les\par
+\par
+Comment en t\'e9l\'e9charger un\par
+\par
+O\'f9 sont stock\'e9s les mod\'e8les\par
+\par
+Comment supprimer un mod\'e8le\par
+\par
+SECTION 7 \f1\emdash  CLI WRAPPER (Run-LocalAI.bat)\par
+Cr\f0\'e9er LocalAI\\Run-LocalAI.bat qui expose les commandes usuelles :\par
+\par
+Commande\tab Action\par
+Run-LocalAI start\tab D\'e9marre tous les services (moteurs + c\f5\u339?ur + LiteLLM)\par
+Run-LocalAI stop\tab Arr\f0\'eate tous les services\par
+Run-LocalAI status\tab\'c9tat des services (PID, ports, uptime)\par
+Run-LocalAI pull <model>\tab T\'e9l\'e9charge un mod\'e8le\par
+Run-LocalAI list\tab Liste les mod\'e8les disponibles\par
+Run-LocalAI backends\tab Liste les backends install\'e9s\par
+Run-LocalAI help\tab Affiche l'aide\par
+Impl\'e9mentation : wrapper .bat qui orchestre les services, avec aide claire si l'argument est manquant.\par
+\par
+SECTION 8 \f1\emdash  CLOUD OFFLOAD (BYOK)\par
+8.1 Principe\par
+L'utilisateur configure ses cl\f0\'e9s API externes dans LocalAI\\config\\cloud-keys.env (non versionn\'e9) :\par
+\par
+text\par
+OPENROUTER_API_KEY=sk-or-...\par
+OPENAI_API_KEY=sk-...\par
+ANTHROPIC_API_KEY=sk-ant-...\par
+Ces cl\'e9s sont lues par LiteLLM au d\'e9marrage. Aucune cl\'e9 n'est stock\'e9e en dur.\par
+\par
+8.2 Sources externes support\'e9es\par
+OpenRouter : {{\field{\*\fldinst{HYPERLINK https://openrouter.ai/ }}{\fldrslt{https://openrouter.ai/\ul0\cf0}}}}\f0\fs22\par
+\par
+OpenAI : {{\field{\*\fldinst{HYPERLINK https://openai.com/ }}{\fldrslt{https://openai.com/\ul0\cf0}}}}\f0\fs22\par
+\par
+Anthropic : {{\field{\*\fldinst{HYPERLINK https://www.anthropic.com/ }}{\fldrslt{https://www.anthropic.com/\ul0\cf0}}}}\f0\fs22\par
+\par
+8.3 S\'e9curit\'e9\par
+Les cl\'e9s sont dans un .env jamais commit\'e9\par
+\par
+INSTALLATION.md documente la proc\'e9dure\par
+\par
+PERIMETRE.md mentionne les URLs autoris\'e9es\par
+\par
+SECTION 9 \f1\emdash  DOCUMENTATION MULTI-MODALE\par
+INSTALLATION.md doit couvrir :\par
+\par
+Installation initiale : python install_localai_win.py\par
+\par
+D\f0\'e9marrage : Run-LocalAI.bat start\par
+\par
+Arr\'eat : Run-LocalAI.bat stop\par
+\par
+T\'e9l\'e9chargement des mod\'e8les : Run-LocalAI.bat pull <model>\par
+\par
+Configuration du routage : \'e9dition de litellm-config.yaml\par
+\par
+Configuration des cl\'e9s API : \'e9dition de cloud-keys.env\par
+\par
+D\'e9pannage : que faire en cas d'erreur\par
+\par
+SECTION 10 \f1\emdash  VALIDATION QA (FIN DE CHANTIER)\par
+Avant de d\f0\'e9clarer la v1.2.0 livr\'e9e, tu dois obligatoirement :\par
+\par
+Lancer une installation r\'e9elle locale en conditions physiques\par
+\par
+V\'e9rifier la connectivit\'e9 de tous les ports : 8080, 8090, 8091, 8092, 8093, 4000\par
+\par
+V\'e9rifier que chaque backend r\'e9pond :\par
+\par
+Texte : /v1/chat/completions sur 8080 (ou 4000 via LiteLLM)\par
+\par
+Audio : /v1/audio/transcriptions sur 8091\par
+\par
+Image : /v1/images/generations sur 8092\par
+\par
+TTS : /v1/audio/speech sur 8093\par
+\par
+V\'e9rifier le routage LiteLLM :\par
+\par
+Requ\'eate courte \f2\u8594?\f0  mod\'e8le local\par
+\par
+Requ\'eate longue \f2\u8594?\f0  mod\'e8le externe (si cl\'e9 configur\'e9e)\par
+\par
+Tuer proprement tous les PIDs \'e0 l'arr\'eat \f1\emdash  z\f0\'e9ro zombie\par
+\par
+\'c9crire le rapport dans dev/patch_integrity.log\par
+\par
+Incr\'e9menter dev/CHANGELOG.md avec la version v1.2.0\par
+\par
+SECTION 11 \f1\emdash  MODE B\f0\'caTA-TESTEUR FOU (OBLIGATOIRE)\par
+\'c0 la fin de la livraison de la v1.2.0, tu bascules imm\'e9diatement en mode B\'caTA-TESTEUR FOU.\par
+\par
+Tu as l'ORDRE STRICT d'\'e9prouver l'int\'e9gralit\'e9 du syst\'e8me en conditions r\'e9elles, et d'appliquer les correctifs imm\'e9diatement pour chaque anomalie d\'e9tect\'e9e. Aucun bug ne doit survivre.\par
+\par
+11.1 Sc\'e9narios \'e0 \'e9prouver intensivement\par
+Sc\'e9nario 1 \f1\emdash  Robustesse des backends\par
+\par
+Lancer chaque backend individuellement\par
+\par
+V\f0\'e9rifier qu'il r\'e9pond sur son API\par
+\par
+Simuler un crash (kill du PID) et v\'e9rifier la reprise\par
+\par
+V\'e9rifier qu'aucun backend ne laisse de processus zombie\par
+\par
+Sc\'e9nario 2 \f1\emdash  Robustesse du routage LiteLLM\par
+\par
+Envoyer une requ\f0\'eate courte \f2\u8594?\f0  v\'e9rifier qu'elle va au local\par
+\par
+Envoyer une requ\'eate longue \f2\u8594?\f0  v\'e9rifier qu'elle va \'e0 l'externe (si cl\'e9 configur\'e9e)\par
+\par
+Simuler une cl\'e9 API invalide \f2\u8594?\f0  v\'e9rifier la gestion d'erreur\par
+\par
+Simuler un timeout du mod\'e8le local \f2\u8594?\f0  v\'e9rifier le fallback\par
+\par
+Sc\'e9nario 3 \f1\emdash  Robustesse du Model Manager\par
+\par
+T\f0\'e9l\'e9charger un mod\'e8le \f2\u8594?\f0  v\'e9rifier l'int\'e9grit\'e9\par
+\par
+Simuler un t\'e9l\'e9chargement interrompu \f2\u8594?\f0  v\'e9rifier la reprise\par
+\par
+Simuler un hash invalide \f2\u8594?\f0  v\'e9rifier le rejet\par
+\par
+Sc\'e9nario 4 \f1\emdash  Robustesse du CLI wrapper\par
+\par
+Lancer chaque commande (start, stop, status, pull, list, backends, help)\par
+\par
+V\f0\'e9rifier qu'aucune ne plante\par
+\par
+V\'e9rifier que les messages d'erreur sont clairs\par
+\par
+Sc\'e9nario 5 \f1\emdash  Robustesse multi-modale\par
+\par
+Envoyer un texte \f2\u8594?\f0  recevoir une r\'e9ponse texte\par
+\par
+Envoyer un audio \f2\u8594?\f0  recevoir une transcription\par
+\par
+Envoyer un prompt \f2\u8594?\f0  recevoir une image\par
+\par
+Envoyer un texte \f2\u8594?\f0  recevoir un audio (TTS)\par
+\par
+Sc\'e9nario 6 \f1\emdash  Robustesse de l'arr\f0\'eat\par
+\par
+Lancer tous les services\par
+\par
+Forcer un arr\'eat (Ctrl+C ou kill)\par
+\par
+V\'e9rifier qu'aucun PID ne survit\par
+\par
+V\'e9rifier que tous les ports sont lib\'e9r\'e9s\par
+\par
+Sc\'e9nario 7 \f1\emdash  Robustesse du routage hybride\par
+\par
+Simuler une panne r\f0\'e9seau\par
+\par
+V\'e9rifier que le routage bascule proprement\par
+\par
+Simuler une coupure du mod\'e8le local\par
+\par
+V\'e9rifier que le fallback externe s'active (si configur\'e9)\par
+\par
+11.2 Fichier log de crash\par
+Cr\'e9er dev/crash.log qui capture :\par
+\par
+Toute exception non g\'e9r\'e9e (avec traceback complet)\par
+\par
+Toute erreur de backend\par
+\par
+Toute erreur de routage LiteLLM\par
+\par
+Toute erreur de t\'e9l\'e9chargement\par
+\par
+Tout crash de processus\par
+\par
+Horodatage pr\'e9cis de chaque entr\'e9e\par
+\par
+Format :\par
+\par
+text\par
+[AAAAMMJJ_HHMMSS] [CATEGORIE] [SEVERITE] Message\par
+Traceback (si applicable)\par
+---\par
+Cat\'e9gories : BACKEND, ROUTING, MODEL, CLI, MULTIMODAL, SHUTDOWN, HYBRID, OTHER\par
+S\'e9v\'e9rit\'e9s : INFO, WARN, ERROR, CRITICAL\par
+\par
+11.3 Auto-healing\par
+Pour chaque anomalie d\'e9tect\'e9e :\par
+\par
+Diagnostiquer la cause racine\par
+\par
+Corriger dans install_localai_win.py\par
+\par
+Re-tester le sc\'e9nario complet\par
+\par
+Documenter dans dev/patch_integrity.log et dev/DECISIONS.md\par
+\par
+V\'e9rifier que le correctif n'introduit pas de r\'e9gression\par
+\par
+11.4 Rapport final\par
+\'c0 la fin du mode b\'eata-testeur, produire dev/BETA_TEST_REPORT.md contenant :\par
+\par
+Liste des sc\'e9narios test\'e9s\par
+\par
+Liste des anomalies d\'e9tect\'e9es\par
+\par
+Liste des correctifs appliqu\'e9s\par
+\par
+Liste des anomalies restantes\par
+\par
+Recommandations pour la v1.3.0\par
+\par
+SECTION 12 \f1\emdash  REMARQUES DE V\f0\'c9RIFICATION DE L'UTILISATEUR\par
+L'utilisateur a personnellement inspect\'e9 la v1.1.0 et demande de v\'e9rifier et corriger les points suivants pendant la Phase 2 :\par
+\par
+12.1 manifest.json pointe vers LocalAI.new\par
+Constat : le manifest g\'e9n\'e9r\'e9 contient "root": "G:\\\\V1\\\\LocalAI-Projet\\\\LocalAI.new" alors que le produit a \'e9t\'e9 bascul\'e9 vers LocalAI\\.\par
+\par
+Action demand\'e9e : apr\'e8s le swap transactionnel, r\'e9\'e9crire le manifest avec le chemin final (root et generated_at corrig\'e9s). Ou accepter un chemin relatif.\par
+\par
+12.2 V\'e9rification des ports r\'e9ellement libres\par
+Constat : la v1.1.0 utilise 8080 (LocalAI) et 8090 (llama-server). La Phase 2 ajoute 4000 (LiteLLM), 8091 (whisper), 8092 (SD), 8093 (TTS).\par
+\par
+Action demand\'e9e : v\'e9rifier qu'aucun de ces ports n'est occup\'e9 au d\'e9marrage, et proposer un port alternatif en cas de conflit.\par
+\par
+12.3 install_localai_win.py est l\'e9ger (~50 Ko)\par
+Constat : le script ma\'eetre fait ~50 Ko parce qu'il n'embarque pas les binaires (qui p\'e8sent plusieurs centaines de Mo).\par
+\par
+Action demand\'e9e : c'est voulu et conforme \'e0 la doctrine. Ne pas chercher \'e0 embarquer les binaires en base64. Le script reste l\'e9ger et lisible.\par
+\par
+12.4 Version v1.1.0 d\'e9j\'e0 prise par la Phase 1\par
+Constat : Cline a incr\'e9ment\'e9 la Phase 1 en v1.1.0. La Phase 2 est donc v1.2.0.\par
+\par
+Action demand\'e9e : incr\'e9menter en v1.2.0 dans install_localai_win.py et manifest.json.\par
+\par
+SECTION 13 \f1\emdash  DEFINITION OF DONE (v1.2.0)\par
+La v1.2.0 est consid\f0\'e9r\'e9e comme aboutie lorsque :\par
+\par
+\f4\u9633?\f0  Python embarqu\'e9 install\'e9 dans LocalAI\\runtime\\python\\\par
+\f4\u9633?\f0  LiteLLM install\'e9 et fonctionnel sur le port 4000\par
+\f4\u9633?\f0  Backends multi-modaux install\'e9s (whisper, SD, kokoro) sur leurs ports\par
+\f4\u9633?\f0  Model Manager (catalogue JSON) op\'e9rationnel\par
+\f4\u9633?\f0  Run-LocalAI.bat expose les commandes usuelles\par
+\f4\u9633?\f0  Routage local/externe fonctionnel (avec cl\'e9s API)\par
+\f4\u9633?\f0  cloud-keys.env document\'e9 et s\'e9curis\'e9\par
+\f4\u9633?\f0  INSTALLATION.md couvre toutes les nouvelles fonctions\par
+\f4\u9633?\f0  Mode b\'eata-testeur ex\'e9cut\'e9 int\'e9gralement\par
+\f4\u9633?\f0  dev/crash.log a captur\'e9 les \'e9ventuels crashs\par
+\f4\u9633?\f0  dev/BETA_TEST_REPORT.md produit\par
+\f4\u9633?\f0  Remarques Section 12 corrig\'e9es\par
+\f4\u9633?\f0  AST au vert (z\'e9ro SyntaxWarning)\par
+\f4\u9633?\f0  Aucun processus zombie apr\'e8s arr\'eat\par
+\f4\u9633?\f0  manifest.json liste tous les composants avec hash\par
+\f4\u9633?\f0  La version est pass\'e9e \'e0 v1.2.0\par
+\f4\u9633?\f0  Une sauvegarde horodat\'e9e existe dans Installeur\\\par
+SECTION 14 \f1\emdash  INTERDICTIONS STRICTES (RAPPEL)\par
+\f4\u10060?\f0  Pas de packaging monolithique\par
+\par
+\f4\u10060?\f0  Pas de Docker\par
+\par
+\f4\u10060?\f0  Pas de WSL sauf dernier recours document\'e9\par
+\par
+\f4\u10060?\f0  Pas de sortie de sandbox (G:\\V1\\LocalAI-Projet\\)\par
+\par
+\f4\u10060?\f0  Pas d'improvisation sur la m\'e9thodologie\par
+\par
+\f4\u10060?\f0  Pas de suppression d\'e9finitive sans passage par old\\\par
+\par
+\f4\u10060?\f0  Pas de demande de validation interm\'e9diaire\par
+\par
+\f4\u10060?\f0  Pas de t\'e9l\'e9chargement hors sources autoris\'e9es sans justification dans DECISIONS.md\par
+\par
+\f4\u10060?\f0  Pas de passage du c\f5\u339?ur Go en Python (le c\u339?ur reste compil\f0\'e9 en Go)\par
+\par
+SECTION 15 \f1\emdash  COMPORTEMENT DE L'AGENT\par
+15.1 Autonomie totale\par
+Tu es en mode (a) : tu t\f0\'e9l\'e9charges tout, tu testes tout, tu livres. Tu ne demandes aucune validation interm\'e9diaire.\par
+\par
+15.2 Auto-healing\par
+Tu d\'e9tectes les anomalies, tu les corriges, tu re-testes. Tu ne laisses AUCUN bug derri\'e8re toi.\par
+\par
+15.3 Livraison\par
+Tu livres un produit fini :\par
+\par
+Le script ma\'eetre install_localai_win.py mis \'e0 jour en v1.2.0\par
+\par
+L'arborescence d\'e9ploy\'e9e LocalAI\\ enrichie\par
+\par
+La documentation mise \'e0 jour\par
+\par
+Le rapport de b\'eata-test complet\par
+\par
+15.4 En cas de blocage\par
+Si tu rencontres un blocage technique majeur, tu documentes dans DECISIONS.md, tu proposes une solution de contournement, et tu poursuis.\par
+\par
+SECTION 16 \f1\emdash  CONFIRMATION\par
+Consid\f0\'e8re ce mandat d'\'e9volution comme ta loi pour la v1.2.0. Lis-le attentivement, confirme ta parfaite compr\'e9hension, puis lance le chantier de mani\'e8re 100 % autonome.\par
+\par
+Tu dois livrer un \'e9cosyst\'e8me d'inf\'e9rence local Windows multi-modal et rout\'e9, dans une arborescence ouverte, modulaire et incr\'e9mentable, pr\'eat \'e0 \'eatre enrichi couche par couche sans jamais devoir d\'e9compiler un ex\'e9cutable.\par
+\par
+Commence maintenant.\lang12\par
+}
+ 

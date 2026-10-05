@@ -1,0 +1,81 @@
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1036{\fonttbl{\f0\fnil\fcharset0 Calibri;}{\f1\fnil Calibri;}{\f2\fnil\fcharset1 Segoe UI Symbol;}}
+{\*\generator Riched20 10.0.29639}\viewkind4\uc1 
+\pard\sa200\sl276\slmult1\f0\fs22\lang12 MANDAT TECHNIQUE ET DIRECTIVE D'EX\'c9CUTION GLOBALE ET UNIFI\'c9E \f1\emdash  VERSION v1.4.0\par
+Sandbox cible : G:\\V1\\LocalAI-Projet\\\par
+Version d'origine : v1.3.0 \f2\u10132?\f0  Version cible : v1.4.0 (Incr\'e9ment strict global)\par
+\par
+Bonjour Cline. Tu agis en tant qu'Ing\'e9nieur principal en Assurance Qualit\'e9 (QA) global et D\'e9veloppeur Senior Full-Stack. Ce mandat unifi\'e9 est ta feuille de route exclusive pour concevoir, impl\'e9menter et valider la version v1.4.0 compl\'e8te de notre \'e9cosyst\'e8me LocalAI natif sous Windows, sans Docker et sans WSL.\par
+\par
+Tu as l'obligation absolue de respecter notre charte constitutionnelle (CHARTE.md). Tu op\'e8res en autonomie totale (mode a) : tu installes, tu codes, tu testes et tu appliques l'auto-healing sur chaque anomalie d\'e9tect\'e9e jusqu'\'e0 l'obtention d'un produit irr\'e9prochable.\par
+\par
+================================================================================\par
+\'c9TAPES INITIALES OBLIGATOIRES (PROTOCOLE TRANSACTIONNEL)\par
+================================================================================\par
+1. SAUVEGARDE ANTE-EX\'c9CUTION : Appelle imm\'e9diatement la routine 'archive_installer()' au sommet de ton main() pour copier le script ma\'eetre 'install_localai_win.py' vers 'Installeur\\' au format horodat\'e9 strict (.py.txt).\par
+2. S\'c9CURISATION DU MANIFEST : Inspecte et corrige imm\'e9diatement 'LocalAI\\manifest.json'. La cl\'e9 "root" doit pointer vers le chemin de production final r\'e9el (G:\\V1\\LocalAI-Projet\\LocalAI\\) ou utiliser un chemin relatif \'e9tanche. \'c9limine d\'e9finitivement toute r\'e9f\'e9rence au dossier temporaire de staging '.new'.\par
+3. VERSIONNAGE : Passe la version globale du script ma\'eetre et du manifest \'e0 "v1.4.0".\par
+\par
+================================================================================\par
+SECTION 1 \f1\emdash  PIPELINE RAG LOCAL UNIFI\f0\'c9 (TEXTE, CODE, PDF, OFFICE)\par
+================================================================================\par
+1. ARCHITECTURE INTRINS\'c8QUE SANS COMPILATION (S\'c9CURIT\'c9 WINDOWS) :\par
+   - L'utilisation de 'faiss-cpu' est STRICTEMENT PROSCRITE pour \'e9viter les \'e9checs de roues de compilation natives C++ sous Windows.\par
+   - La base vectorielle et la recherche de similarit\'e9 doivent reposer EXCLUSIVEMENT sur NumPy et un calcul matriciel pur Python de similarit\'e9 cosinus (produit scalaire normalis\'e9).\par
+2. D\'c9PLOIEMENT ISOL\'c9 DANS LE RUNTIME :\par
+   - Utilise le Python embarqu\'e9 (LocalAI\\runtime\\python\\python.exe) pour installer de mani\'e8re isol\'e9e via pip (--target) les d\'e9pendances suivantes dans 'LocalAI\\runtime\\python\\Lib\\site-packages\\' :\par
+     * numpy>=1.24.0 (calcul matriciel et stockage)\par
+     * pypdf>=4.0.0 (extraction de documents PDF)\par
+     * python-docx (extraction de documents Word)\par
+     * openpyxl (extraction de documents Excel)\par
+   - S\'c9CURIT\'c9 PYTHON EMBED : Assure-toi que le fichier 'python311._pth' (ou \'e9quivalent) contient ou active bien la ligne 'import site' pour que le dossier 'site-packages' soit correctement lu au runtime, \'e9vitant tout 'ModuleNotFoundError'.\par
+3. ALGORITHME D'INGESTION ET PERSISTANCE \'c0 PLAT :\par
+   - Int\'e8gre une routine d'extraction robuste capable d'isoler le texte brut des fichiers texte brut/code source (.txt, .py, .md, .json, .js, .go, .rs, .c, .cpp), ainsi que des formats PDF, Word (.docx) et Excel (.xlsx).\par
+   - D\'e9coupe le texte en blocs (Chunks) d'une taille fixe align\'e9e sur les contraintes du Prompt Caching de llama.cpp (multiples exacts de 512 ou 1024 tokens, soit environ 1500 \'e0 3000 caract\'e8res), avec un recouvrement (Overlap) strict de 10%.\par
+   - Sauvegarde les index, les m\'e9tadonn\'e9es (texte d'origine, chemin, id) et la matrice des vecteurs d'embeddings \'e0 plat sous forme de fichiers s\'e9rialis\'e9s (.npy ou JSON structur\'e9) dans : 'LocalAI\\runtime\\storage\\'\par
+\par
+================================================================================\par
+SECTION 2 \f1\emdash  AGENT HUB & LITELLM AVANC\f0\'c9 ("SP\'c9CIAL CLINE")\par
+================================================================================\par
+1. MOD\'c8LE VIRTUEL UNIQUE :\par
+   - Configure le proxy LiteLLM (port 4000) pour exposer un mod\'e8le virtuel unique nomm\'e9 : cline-champion-model\par
+   - Ce mod\'e8le virtuel sert de passerelle unique pour Cline dans VS Code. Lorsque l'utilisateur change de mod\'e8le actif ou de profil de performance dans l'\'e9cosyst\'e8me local, l'alias est mis \'e0 jour dynamiquement par ton script Python en t\'e2che de fond. La configuration de Cline n'a JAMAIS besoin d'\'eatre modifi\'e9e.\par
+2. ACTIVATION & PR\'c9SERVATION DU PROMPT CACHING :\par
+   - C\'f4t\'e9 llama.cpp : Assure-toi que le drapeau '--prompt-cache' est explicitement inject\'e9 dans les param\'e8tres de lancement pour \'e9craser le temps de traitement des prompts syst\'e8mes r\'e9p\'e9titifs.\par
+   - C\'f4t\'e9 LiteLLM : Configure un m\'e9canisme de 'session affinity' (affinit\'e9 de session) pour pr\'e9server l'int\'e9grit\'e9 du cache de contexte entre les appels successifs de l'agent.\par
+3. ROUTAGE HYBRIDE CONTEXTUEL (TOKEN SAVER \'c9TENDU) :\par
+   - Ton reverse proxy Python doit intercepter les requ\'eates. Analyse la taille du contexte accumul\'e9 par Cline et croise-la avec la VRAM disponible lue dans 'config\\hardware-profile.json'.\par
+   - Requ\'eate courte ou t\'e2che de routine \f2\u10132?\f0  Routage local \'e9conome vers LocalAI / backends GPU locaux.\par
+   - Contexte massif ou refactoring lourd qui sature les limites mat\'e9rielles locales \f2\u10132?\f0  Bascule automatique et transparente vers les APIs cloud (Claude 3.5 Sonnet, DeepSeek ou OpenAI) en utilisant les cl\'e9s configur\'e9es de mani\'e8re s\'e9curis\'e9e par l'utilisateur dans 'config\\cloud-keys.env' (non versionn\'e9).\par
+\par
+================================================================================\par
+SECTION 3 \f1\emdash  ENRICHISSEMENT DU CLI WRAPPER (Run-LocalAI.bat)\par
+================================================================================\par
+Modifie le fichier de contr\f0\'f4le 'LocalAI\\Run-LocalAI.bat' pour int\'e9grer les trois nouvelles commandes d'orchestration :\par
+- Run-LocalAI index <chemin_dossier> : Ex\'e9cute le script d'ingestion Python, scanne le dossier cible, extrait le texte de tous les formats pris en charge (.txt, .py, .pdf, .docx, .xlsx), ex\'e9cute le chunking g\'e9om\'e9trique et g\'e9n\'e8re/met \'e0 jour la base vectorielle locale dans 'runtime\\storage\\'.\par
+- Run-LocalAI proxy-logs : Affiche les logs de routage en temps r\'e9el de LiteLLM et du Token Saver (visualisation des requ\'eates intercept\'e9es et du mod\'e8le s\'e9lectionn\'e9 : local ou cloud).\par
+- Run-LocalAI key-set <provider> <valeur_cle> : Injecte ou met \'e0 jour de fa\'e7on s\'e9curis\'e9e la cl\'e9 d'un fournisseur (OPENROUTER, OPENAI, ANTHROPIC) dans 'config\\cloud-keys.env' sans alt\'e9rer le reste du fichier.\par
+\par
+================================================================================\par
+SECTION 4 \f1\emdash  PROTOCOLE DE VALIDATION ET B\f0\'caTA-TESTEUR FOU (QA)\par
+================================================================================\par
+Bascule imm\'e9diatement en mode B\'caTA-TESTEUR FOU pour \'e9prouver le syst\'e8me en conditions r\'e9elles et appliquer l'auto-healing si n\'e9cessaire :\par
+1. SC\'c9NARIO PIPELINE MULTI-MODAL : Cr\'e9e un dossier de test contenant un fichier de chaque format (.txt, .py, .pdf, .docx, .xlsx). Ex\'e9cute 'Run-LocalAI.bat index <dossier_test>'. V\'e9rifie qu'aucune exception n'est lev\'e9e et que les index naissent \'e0 plat dans 'runtime\\storage\\'.\par
+2. SC\'c9NARIO ROUTAGE HYBRIDE : Simule l'envoi d'une requ\'eate courte (routage local) puis d'une requ\'eate saturant le contexte (validation de la bascule cloud via LiteLLM avec une cl\'e9 de test).\par
+3. SC\'c9NARIO ARR\'caT & VERROU : V\'e9rifie qu'aucun processus Python ou binaire ne reste bloqu\'e9 en t\'e2che de fond apr\'e8s l'ex\'e9cution de l'indexation ou de l'arr\'eat g\'e9n\'e9ral (z\'e9ro zombie, lib\'e9ration compl\'e8te des ports et de la VRAM).\par
+4. JOURNALISATION DES CRASHS : Capture toute anomalie ou exception dans 'dev\\crash.log' sous les cat\'e9gories 'RAG_INGEST', 'VECTOR_DB' ou 'PROXY_GATEWAY' avec le traceback complet et l'horodatage exact.\par
+5. TRA\'c7ABILIT\'c9 FINALE : Mets \'e0 jour 'dev\\CHANGELOG.md' (version v1.4.0), documente tes d\'e9cisions d'architecture dans 'dev\\DECISIONS.md', consigne la validation dans 'dev\\patch_integrity.log', produis le rapport 'dev\\BETA_TEST_REPORT.md' et enrichis 'INSTALLATION.md' pour l'utilisateur.\par
+\par
+================================================================================\par
+CLAUSE D'AUTO-R\'c9GULATION (S\'c9CURIT\'c9 DE CONTEXTE ACCRUE)\par
+================================================================================\par
+Si tu estimes, en cours de route, que la charge de la v1.4.0 d\'e9passe ta capacit\'e9 de traitement ou les limites de ta fen\'eatre de contexte en un seul incr\'e9ment, tu es explicitement autoris\'e9 \'e0 d\'e9couper ce chantier en deux \'e9tapes : v1.4.0a (RAG multi-format et indexation NumPy seul) puis v1.4.0b (Agent Hub + LiteLLM avanc\'e9 et Routage).\par
+\par
+Si tu choisis cette option :\par
+1. Documente imm\'e9diatement ce choix et sa justification technique dans 'dev\\DECISIONS.md'.\par
+2. Livre et valide la v1.4.0a au vert en premier \'e0 travers ton protocole de test.\par
+3. Encha\'eene ensuite de mani\'e8re autonome sur la v1.4.0b pour compl\'e9ter le mandat v1.4.0 global.\par
+La doctrine transactionnelle reste inchang\'e9e \'e0 chaque \'e9tape : sauvegarde ante-ex\'e9cution, patch chirurgical, test et validation AST.\par
+\par
+Ex\'e9cute l'int\'e9gralit\'e9 de ce grand chantier de mani\'e8re autonome et livre la version v1.4.0 stabilis\'e9e au vert. Tu peux commencer.\par
+}
+ 

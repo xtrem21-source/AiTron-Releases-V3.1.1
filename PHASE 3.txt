@@ -1,0 +1,576 @@
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1036{\fonttbl{\f0\fnil\fcharset0 Calibri;}{\f1\fnil Calibri;}{\f2\fnil\fcharset1 Cambria Math;}{\f3\fnil\fcharset1 Segoe UI Symbol;}{\f4\fnil\fcharset1 Segoe UI Symbol;}{\f5\fnil\fcharset238 Calibri;}}
+{\colortbl ;\red0\green0\blue255;}
+{\*\generator Riched20 10.0.29639}{\*\mmathPr\mmathFont2\mwrapIndent1440 }\viewkind4\uc1 
+\pard\sa200\sl276\slmult1\f0\fs22\lang12 M\'c9THODE-LOCALAI-WINDOWS-v1.3.0.md\par
+MANDAT D'\'c9VOLUTION \f1\emdash  v1.2.0 \f2\u8594?\f0  v1.3.0\par
+Projet : Portage Windows natif et autonome de LocalAI\par
+Version cible : v1.3.0 (incr\'e9ment de la v1.2.0)\par
+Sandbox : G:\\V1\\LocalAI-Projet\\\par
+Pr\'e9requis : Phase v1.2.0 termin\'e9e et valid\'e9e\par
+PR\'c9REQUIS \f1\emdash  LA v1.2.0 EST TERMIN\f0\'c9E\par
+Tu as d\'e9j\'e0 livr\'e9 la v1.2.0 du portage LocalAI Windows. Cette v1.2.0 a produit :\par
+\par
+install_localai_win.py (script ma\'eetre v1.2.0)\par
+\par
+LocalAI\\ enrichi avec :\par
+\par
+runtime\\python\\ (Python embarqu\'e9 pour LiteLLM)\par
+\par
+backends\\whisper-cpp\\, backends\\stable-diffusion\\, backends\\tts\\\par
+\par
+models\\models-catalog.json (catalogue multi-modal)\par
+\par
+config\\litellm-config.yaml, config\\cloud-keys.env\par
+\par
+Run-LocalAI.bat (lanceur principal)\par
+\par
+Documentation mise \'e0 jour, tra\'e7abilit\'e9 compl\'e8te\par
+\par
+Architecture v1.2.0 en place :\par
+\par
+text\par
+client \f2\u8594?\f0  LiteLLM (:4000) \f2\u8594?\f0  \{ local-ai (:8080) \f2\u8594?\f0  cloud-proxy \f2\u8594?\f0  llama-server (:8090) \f2\u8594?\f0  *.gguf\par
+                            whisper-server (:8091)\par
+                            sd (:8092)\par
+                            kokoro (:8093) \}\par
+Ce mandat est la v1.3.0. Tu vas faire \'e9voluer cet existant vers l'optimisation GPU en respectant int\'e9gralement la doctrine transactionnelle de la charte (sauvegarde ante-ex\'e9cution, bo\'eete noire Installeur\\, validation AST triple, rollback).\par
+\par
+Tu n'\'e9crases rien. Tu INCR\'c9MENTES.\par
+\par
+R\'d4LE ET MANDAT\par
+Tu es Ing\'e9nieur principal en Assurance Qualit\'e9 (QA) global, Expert en S\'e9curit\'e9 Syst\'e8me/Web et D\'e9veloppeur Senior Full-Stack. Ce fichier est un mandat d'\'e9volution qui s'ajoute \'e0 la charte fondamentale CHARTE.md (d\'e9j\'e0 en vigueur dans la sandbox).\par
+\par
+Rappel de la doctrine : on n'\'e9crase jamais l'acquis stable. On INCR\'c9MENTE. La v1.2.0 est ta base. Tu vas la faire \'e9voluer vers la v1.3.0 en greffant les fonctions d\'e9crites ci-dessous, sans jamais casser ce qui fonctionne d\'e9j\'e0.\par
+\par
+\f3\u-10179?\u-9023?\f0  RAPPEL DU P\'c9RIM\'c8TRE\par
+Ton espace de travail reste G:\\V1\\LocalAI-Projet\\. Tu ne sors jamais de ce r\'e9pertoire.\par
+\par
+Structure cible apr\'e8s v1.3.0 :\par
+\par
+text\par
+G:\\V1\\LocalAI-Projet\\\par
+\f4\u9500?\u9472?\u9472?\f0  CHARTE.md                    \f2\u8592?\f0  La charte fondamentale\par
+\f4\u9500?\u9472?\u9472?\f0  install_localai_win.py       \f2\u8592?\f0  L'installeur ma\'eetre (\'e0 faire \'e9voluer \f2\u8594?\f0  v1.3.0)\par
+\f4\u9500?\u9472?\u9472?\f0  PERIMETRE.md                 \f2\u8592?\f0  Contrat de confinement\par
+\f4\u9500?\u9472?\u9472?\f0  JOURNAL.md                   \f2\u8592?\f0  Journal narratif\par
+\f4\u9500?\u9472?\u9472?\f0  INSTALLATION.md              \f2\u8592?\f0  Documentation utilisateur (\'e0 enrichir)\par
+\f4\u9500?\u9472?\u9472?\f0  Installeur\\                  \f2\u8592?\f0  Bo\'eete noire (versions ant\'e9rieures)\par
+\f4\u9500?\u9472?\u9472?\f0  dev\\\par
+\f4\u9474?\f0    \f4\u9500?\u9472?\u9472?\f0  CHANGELOG.md             \f2\u8592?\f0  \'c0 incr\'e9menter (v1.3.0)\par
+\f4\u9474?\f0    \f4\u9500?\u9472?\u9472?\f0  DECISIONS.md             \f2\u8592?\f0  \'c0 enrichir\par
+\f4\u9474?\f0    \f4\u9500?\u9472?\u9472?\f0  patch_integrity.log      \f2\u8592?\f0  \'c0 enrichir\par
+\f4\u9474?\f0    \f4\u9500?\u9472?\u9472?\f0  crash.log                \f2\u8592?\f0  \'c0 enrichir\par
+\f4\u9474?\f0    \f4\u9500?\u9472?\u9472?\f0  BETA_TEST_REPORT.md      \f2\u8592?\f0  \'c0 enrichir\par
+\f4\u9474?\f0    \f4\u9492?\u9472?\u9472?\f0  old\\\par
+\f4\u9500?\u9472?\u9472?\f0  log\\\par
+\f4\u9500?\u9472?\u9472?\f0  build\\                       \f2\u8592?\f0  Toolchain, sources, caches\par
+\f4\u9492?\u9472?\u9472?\f0  LocalAI\\\par
+    \f4\u9500?\u9472?\u9472?\f0  local-ai.exe\par
+    \f4\u9500?\u9472?\u9472?\f0  backends\\\par
+    \f4\u9474?\f0    \f4\u9500?\u9472?\u9472?\f0  llama-cpp\\           \f2\u8592?\f0  NOUVEAU : variante GPU selon d\'e9tection\par
+    \f4\u9474?\f0    \f4\u9500?\u9472?\u9472?\f0  whisper-cpp\\\par
+    \f4\u9474?\f0    \f4\u9500?\u9472?\u9472?\f0  stable-diffusion\\\par
+    \f4\u9474?\f0    \f4\u9492?\u9472?\u9472?\f0  tts\\\par
+    \f4\u9500?\u9472?\u9472?\f0  models\\\par
+    \f4\u9474?\f0    \f4\u9492?\u9472?\u9472?\f0  models-catalog.json\par
+    \f4\u9500?\u9472?\u9472?\f0  runtime\\\par
+    \f4\u9474?\f0    \f4\u9492?\u9472?\u9472?\f0  python\\\par
+    \f4\u9500?\u9472?\u9472?\f0  config\\\par
+    \f4\u9474?\f0    \f4\u9500?\u9472?\u9472?\f0  litellm-config.yaml\par
+    \f4\u9474?\f0    \f4\u9500?\u9472?\u9472?\f0  cloud-keys.env\par
+    \f4\u9474?\f0    \f4\u9492?\u9472?\u9472?\f0  hardware-profile.json  \f2\u8592?\f0  NOUVEAU : profil mat\'e9riel d\'e9tect\'e9\par
+    \f4\u9500?\u9472?\u9472?\f0  logs\\\par
+    \f4\u9500?\u9472?\u9472?\f0  Run-LocalAI.bat\par
+    \f4\u9500?\u9472?\u9472?\f0  launcher.bat\par
+    \f4\u9500?\u9472?\u9472?\f0  stop.bat\par
+    \f4\u9500?\u9472?\u9472?\f0  download_model.bat\par
+    \f4\u9492?\u9472?\u9472?\f0  manifest.json\par
+SECTION 1 \f1\emdash  PROTOCOLE TRANSACTIONNEL (RAPPEL)\par
+Le cycle de vie de toute modification reste inchang\f0\'e9 :\par
+\par
+text\par
+SAUVEGARDE ANTE-EX\'c9CUTION \f2\u8594?\f0  PATCH CHIRURGICAL \f2\u8594?\f0  COMPILATION / TEST \f2\u8594?\f0  VALIDATION RATIFI\'c9E\par
+Rappels critiques :\par
+\par
+archive_installer() reste la premi\'e8re instruction de main()\par
+\par
+La bo\'eete noire Installeur\\ archive le script ma\'eetre \'e0 chaque ex\'e9cution\par
+\par
+La validation AST triple reste obligatoire avant \'e9criture disque\par
+\par
+Le versionnage passe de v1.2.0 \'e0 v1.3.0 (incr\'e9ment strict)\par
+\par
+SECTION 2 \f1\emdash  OBJECTIF DE L'\f0\'c9VOLUTION v1.3.0\par
+Faire \'e9voluer le portage LocalAI Windows de la v1.2.0 vers la v1.3.0 en ajoutant :\par
+\par
+D\'e9tection mat\'e9rielle GPU (NVIDIA / AMD / Intel / Vulkan)\par
+\par
+T\'e9l\'e9chargement du bon binaire llama.cpp (CUDA / HIP / Vulkan / CPU)\par
+\par
+Calcul automatique des param\'e8tres optimaux (-ngl, threads, ctx) \f1\emdash  h\f0\'e9rit\'e9 de la logique AiTron\par
+\par
+Profils de performance (SOFT / NORMAL / HARD / AUTO / CUSTOM)\par
+\par
+Profil mat\'e9riel persistant (config\\hardware-profile.json)\par
+\par
+Optimisation multi-modale (les backends whisper, SD, TTS profitent aussi du GPU si possible)\par
+\par
+SECTION 3 \f1\emdash  D\f0\'c9TECTION MAT\'c9RIELLE GPU\par
+3.1 D\'e9tection multi-constructeur\par
+Le script doit d\'e9tecter, dans l'ordre :\par
+\par
+Priorit\'e9\tab D\'e9tection\tab M\'e9thode\par
+1\tab NVIDIA\tab nvidia-smi --query-gpu=name,memory.total,memory.free --format=csv,noheader,nounits\par
+2\tab AMD ROCm/HIP\tab rocm-smi ou pr\'e9sence de amdhip64.dll\par
+3\tab Vulkan (fallback GPU)\tab Pr\'e9sence de vulkan-1.dll + ggml-vulkan.dll\par
+4\tab CPU (fallback)\tab Si aucun GPU d\'e9tect\'e9\par
+3.2 D\'e9tection VRAM g\'e9n\'e9rique (AMD/Intel)\par
+Si nvidia-smi \'e9choue, tenter une d\'e9tection g\'e9n\'e9rique via WMI + registre Windows :\par
+\par
+Win32_VideoController.AdapterRAM (attention : d\'e9bordement au-del\'e0 de ~4 Go)\par
+\par
+HardwareInformation.qwMemorySize dans le registre (QWORD fiable)\par
+\par
+Marge de s\'e9curit\'e9 : 85 % de la VRAM totale (estimation, pas mesure)\par
+\par
+3.3 Profil mat\'e9riel persistant\par
+\'c9crire LocalAI\\config\\hardware-profile.json :\par
+\par
+json\par
+\{\par
+  "detected_at": "2026-10-03T15:00:00Z",\par
+  "cpu": \{\par
+    "name": "AMD Ryzen 9 5950X",\par
+    "cores": 16,\par
+    "threads": 32\par
+  \},\par
+  "ram_gb": 64,\par
+  "gpu": \{\par
+    "vendor": "NVIDIA",\par
+    "name": "GeForce RTX 4090",\par
+    "vram_total_mb": 24576,\par
+    "vram_free_mb": 23500,\par
+    "backend": "cuda",\par
+    "detection_method": "nvidia-smi"\par
+  \},\par
+  "recommended_profile": "hard"\par
+\}\par
+Ce fichier est relu \'e0 chaque d\'e9marrage pour \'e9viter de recalculer inutilement.\par
+\par
+SECTION 4 \f1\emdash  T\f0\'c9L\'c9CHARGEMENT DU BON BINAIRE LLAMA.CPP\par
+4.1 Variantes disponibles\par
+Les releases ggml-org/llama.cpp fournissent des builds Windows pour chaque backend :\par
+\par
+Backend\tab Fichier ZIP\par
+CUDA 12.4\tab llama-bXXXXX-bin-win-cuda-12.4-x64.zip\par
+CUDA 13.1\tab llama-bXXXXX-bin-win-cuda-13.1-x64.zip\par
+HIP/ROCm (AMD)\tab llama-bXXXXX-bin-win-hip-radeon-x64.zip\par
+Vulkan\tab llama-bXXXXX-bin-win-vulkan-x64.zip\par
+CPU\tab llama-bXXXXX-bin-win-cpu-x64.zip\par
+4.2 S\'e9lection automatique\par
+Le script choisit la variante selon le mat\'e9riel d\'e9tect\'e9 :\par
+\par
+python\par
+def select_llama_variant(hw):\par
+    if hw.gpu.vendor == "NVIDIA":\par
+        return "cuda-12.4"  # ou cuda-13.1 selon la version CUDA install\'e9e\par
+    if hw.gpu.vendor == "AMD":\par
+        return "hip-radeon"\par
+    if hw.gpu.vulkan_supported:\par
+        return "vulkan"\par
+    return "cpu"\par
+4.3 Version fig\'e9e\par
+Version cible : b11375 (m\'eame que v1.1.0, coh\'e9rence)\par
+\par
+Liste de repli : b11374, b11373, b11372\par
+\par
+Hash SHA-256 : \'e0 calculer lors du premier t\'e9l\'e9chargement, puis fig\'e9\par
+\par
+4.4 Gestion des DLLs CUDA\par
+Pour la variante CUDA, il faut aussi :\par
+\par
+cudart-llama-bin-win-cuda-12.4-x64.zip (runtime CUDA)\par
+\par
+OU utiliser le CUDA Toolkit install\'e9 sur la machine\par
+\par
+Strat\'e9gie : t\'e9l\'e9charger le runtime CUDA avec le binaire llama.cpp pour garantir l'autonomie.\par
+\par
+SECTION 5 \f1\emdash  CALCUL AUTOMATIQUE DES PARAM\f0\'c8TRES OPTIMAUX\par
+5.1 H\'e9ritage de la logique AiTron\par
+Reprendre la logique de calcul d'AiTron (\'e9prouv\'e9e) :\par
+\par
+Calcul du nombre de couches GPU (-ngl) :\par
+\par
+python\par
+def estimate_ngl(model_info, hw, ctx, margin_mb):\par
+    """\par
+    Calcule le nombre optimal de couches \'e0 d\'e9charger sur le GPU.\par
+    Bas\'e9 sur :\par
+      - VRAM libre (hw.vram_free_mb)\par
+      - Marge de s\'e9curit\'e9 (margin_mb)\par
+      - Taille du mod\'e8le (model_info.tensor_bytes)\par
+      - Taille du cache KV (kv_cache_bytes(model_info, ctx))\par
+    """\par
+    if not hw.has_gpu or hw.vram_free_mb <= 0:\par
+        return 0\par
+    budget = (hw.vram_free_mb - margin_mb) * 1024 ** 2\par
+    if budget <= 0:\par
+        return 0\par
+    kv_total = kv_cache_bytes(model_info, ctx)\par
+    kv_per_layer = kv_total // model_info.n_layers\par
+    per_layer = int((model_info.layer_bytes + kv_per_layer) * 1.10)  # marge 10%\par
+    if per_layer <= 0:\par
+        return 0\par
+    compute_buf = (max(model_info.n_vocab, 32000) * 8) + (ctx * max(model_info.n_embd, 1) * 4)\par
+    fit = (budget - compute_buf) // per_layer\par
+    if fit >= model_info.n_layers and (budget - compute_buf - model_info.n_layers * per_layer) >= model_info.non_layer_bytes:\par
+        return model_info.n_layers + 1  # tout sur GPU\par
+    return int(max(0, min(fit, model_info.n_layers)))\par
+Calcul des threads CPU :\par
+\par
+Profil SOFT \f2\u8594?\f0  cpu_cores (physiques)\par
+\par
+Profil NORMAL \f2\u8594?\f0  cpu_threads (logiques)\par
+\par
+Profil HARD \f2\u8594?\f0  cpu_threads\par
+\par
+Profil AUTO \f2\u8594?\f0  d\'e9tection dynamique\par
+\par
+Calcul du contexte (ctx) :\par
+\par
+Align\'e9 sur un multiple exact de 4096 tokens (Prompt Caching)\par
+\par
+Adapt\'e9 \'e0 la VRAM disponible\par
+\par
+Plafonn\'e9 par model_info.n_ctx_train\par
+\par
+5.2 Profils de performance\par
+Profil\tab Marge VRAM\tab Contexte\tab Threads\tab NGL\par
+SOFT\tab 1536 Mo\tab 4096\tab C\f5\u339?urs\tab 0 (CPU)\par
+NORMAL\tab 1024 Mo\tab 4096\tab Threads\tab auto\par
+HARD\tab 768 Mo\tab 8192 (si VRAM \f2\u8805?\f0  8 Go)\tab Threads\tab auto\par
+AUTO\tab dynamique\tab 8192 (si VRAM \f2\u8805?\f0  8 Go)\tab Threads\tab auto\par
+CUSTOM\tab manuel\tab manuel\tab manuel\tab manuel\par
+5.3 S\'e9curit\'e9 VRAM\par
+Avant chaque lancement, v\'e9rifier que la configuration tient dans la VRAM :\par
+\par
+python\par
+def check_vram_safety(ngl, vram_free_mb, vram_needed_mb):\par
+    ratio = vram_free_mb / vram_needed_mb if vram_needed_mb > 0 else 1.0\par
+    if ratio >= 1.05:\par
+        return ("optimal", ratio, True)\par
+    if ratio >= 0.75:\par
+        return ("possible", ratio, False)\par
+    return ("experimental", ratio, False)\par
+Si la VRAM est insuffisante, basculer automatiquement en CPU (-ngl 0) et logger l'\'e9v\'e9nement.\par
+\par
+SECTION 6 \f1\emdash  OPTIMISATION MULTI-MODALE\par
+6.1 Whisper.cpp avec GPU\par
+Whisper.cpp supporte CUDA, Vulkan, ROCm. Le script doit :\par
+\par
+D\f0\'e9tecter le GPU\par
+\par
+T\'e9l\'e9charger la variante correspondante de whisper-server.exe\par
+\par
+Configurer les param\'e8tres GPU (-ng ou \'e9quivalent)\par
+\par
+6.2 Stable-diffusion.cpp avec GPU\par
+Idem : variantes CUDA / Vulkan / ROCm disponibles.\par
+\par
+6.3 Kokoro TTS\par
+Kokoro est bas\'e9 sur ONNX Runtime. Il peut utiliser :\par
+\par
+CUDA (via onnxruntime-gpu)\par
+\par
+DirectML (Windows natif)\par
+\par
+CPU (fallback)\par
+\par
+Le script doit installer le bon provider ONNX selon le GPU d\'e9tect\'e9.\par
+\par
+SECTION 7 \f1\emdash  INT\f0\'c9GRATION DANS Run-LocalAI.bat\par
+7.1 Nouvelles commandes\par
+Commande\tab Action\par
+Run-LocalAI profile\tab Affiche le profil mat\'e9riel d\'e9tect\'e9\par
+Run-LocalAI optimize\tab Relance le calcul d'optimisation\par
+Run-LocalAI benchmark\tab Mesure les tokens/s r\'e9els du mod\'e8le actif\par
+Run-LocalAI set-profile <soft|normal|hard|auto>\tab Change le profil\par
+7.2 S\'e9lection automatique au d\'e9marrage\par
+Run-LocalAI.bat start doit :\par
+\par
+Lire config\\hardware-profile.json\par
+\par
+S\'e9lectionner le profil appropri\'e9 (recommended_profile)\par
+\par
+Lancer llama-server.exe avec les param\'e8tres calcul\'e9s (-ngl, --threads, --ctx-size)\par
+\par
+Lancer les autres services\par
+\par
+SECTION 8 \f1\emdash  DOCUMENTATION\par
+INSTALLATION.md doit couvrir :\par
+\par
+D\f0\'e9tection mat\'e9rielle : comment le script identifie le GPU\par
+\par
+S\'e9lection du binaire : comment il choisit CUDA / HIP / Vulkan / CPU\par
+\par
+Profils de performance : SOFT / NORMAL / HARD / AUTO\par
+\par
+Calcul des param\'e8tres : comment -ngl, threads, ctx sont d\'e9termin\'e9s\par
+\par
+S\'e9curit\'e9 VRAM : que se passe-t-il si la VRAM est insuffisante\par
+\par
+D\'e9pannage GPU : que faire si le GPU n'est pas d\'e9tect\'e9\par
+\par
+SECTION 9 \f1\emdash  VALIDATION QA\par
+Avant de d\f0\'e9clarer la v1.3.0 livr\'e9e, tu dois obligatoirement :\par
+\par
+D\'e9tecter le GPU r\'e9el de la machine de test\par
+\par
+T\'e9l\'e9charger la bonne variante de llama.cpp (CUDA / HIP / Vulkan / CPU)\par
+\par
+V\'e9rifier que le binaire GPU fonctionne : llama-server.exe --version doit afficher le backend\par
+\par
+Mesurer les performances : comparer CPU vs GPU (benchmark r\'e9el)\par
+\par
+V\'e9rifier la s\'e9curit\'e9 VRAM : lancer un mod\'e8le trop gros et v\'e9rifier la bascule CPU\par
+\par
+Tuer proprement tous les PIDs \f1\emdash  z\f0\'e9ro zombie\par
+\par
+\'c9crire le rapport dans dev/patch_integrity.log\par
+\par
+Incr\'e9menter dev/CHANGELOG.md avec la version v1.3.0\par
+\par
+SECTION 10 \f1\emdash  MODE B\f0\'caTA-TESTEUR FOU (OBLIGATOIRE)\par
+\'c0 la fin de la livraison de la v1.3.0, tu bascules imm\'e9diatement en mode B\'caTA-TESTEUR FOU.\par
+\par
+Tu as l'ORDRE STRICT d'\'e9prouver l'int\'e9gralit\'e9 du syst\'e8me en conditions r\'e9elles, et d'appliquer les correctifs imm\'e9diatement pour chaque anomalie d\'e9tect\'e9e. Aucun bug ne doit survivre.\par
+\par
+10.1 Sc\'e9narios \'e0 \'e9prouver intensivement\par
+Sc\'e9nario 1 \f1\emdash  Robustesse de la d\f0\'e9tection GPU\par
+\par
+Simuler l'absence de nvidia-smi\par
+\par
+Simuler un GPU AMD sans ROCm\par
+\par
+Simuler un GPU Intel int\'e9gr\'e9\par
+\par
+V\'e9rifier que le fallback CPU s'active proprement\par
+\par
+Sc\'e9nario 2 \f1\emdash  Robustesse du t\f0\'e9l\'e9chargement\par
+\par
+Simuler un binaire CUDA indisponible (release supprim\'e9e)\par
+\par
+V\'e9rifier le repli vers Vulkan\par
+\par
+V\'e9rifier le repli ultime vers CPU\par
+\par
+V\'e9rifier le hash SHA-256 de chaque variante\par
+\par
+Sc\'e9nario 3 \f1\emdash  Robustesse du calcul -ngl\par
+\par
+Tester avec un mod\f0\'e8le trop gros pour la VRAM\par
+\par
+V\'e9rifier que -ngl est correctement r\'e9duit\par
+\par
+V\'e9rifier que la bascule CPU s'active si n\'e9cessaire\par
+\par
+V\'e9rifier que le contexte est align\'e9 sur 4096\par
+\par
+Sc\'e9nario 4 \f1\emdash  Robustesse des profils\par
+\par
+Tester chaque profil (SOFT, NORMAL, HARD, AUTO, CUSTOM)\par
+\par
+V\f0\'e9rifier que les param\'e8tres sont coh\'e9rents\par
+\par
+V\'e9rifier que le profil est persist\'e9 dans hardware-profile.json\par
+\par
+Sc\'e9nario 5 \f1\emdash  Benchmark CPU vs GPU\par
+\par
+Mesurer les tokens/s en CPU\par
+\par
+Mesurer les tokens/s en GPU\par
+\par
+V\f0\'e9rifier que le GPU est bien plus rapide (si GPU disponible)\par
+\par
+Documenter les r\'e9sultats dans dev/BETA_TEST_REPORT.md\par
+\par
+Sc\'e9nario 6 \f1\emdash  Robustesse multi-modale GPU\par
+\par
+V\f0\'e9rifier que whisper utilise le GPU si disponible\par
+\par
+V\'e9rifier que stable-diffusion utilise le GPU\par
+\par
+V\'e9rifier que kokoro utilise le bon provider ONNX\par
+\par
+Sc\'e9nario 7 \f1\emdash  Robustesse de l'arr\f0\'eat\par
+\par
+Lancer tous les services (GPU)\par
+\par
+Forcer un arr\'eat\par
+\par
+V\'e9rifier qu'aucun PID ne survit\par
+\par
+V\'e9rifier que la VRAM est bien lib\'e9r\'e9e\par
+\par
+10.2 Fichier log de crash\par
+Enrichir dev/crash.log avec les cat\'e9gories GPU :\par
+\par
+GPU_DETECT\par
+\par
+GPU_DOWNLOAD\par
+\par
+GPU_VRAM\par
+\par
+GPU_BENCH\par
+\par
+PROFILE\par
+\par
+10.3 Auto-healing\par
+Pour chaque anomalie d\'e9tect\'e9e :\par
+\par
+Diagnostiquer la cause racine\par
+\par
+Corriger dans install_localai_win.py\par
+\par
+Re-tester le sc\'e9nario complet\par
+\par
+Documenter dans dev/patch_integrity.log et dev/DECISIONS.md\par
+\par
+V\'e9rifier que le correctif n'introduit pas de r\'e9gression\par
+\par
+10.4 Rapport final\par
+Enrichir dev/BETA_TEST_REPORT.md avec :\par
+\par
+R\'e9sultats de benchmark CPU vs GPU\par
+\par
+Tableau des performances par profil\par
+\par
+Anomalies GPU d\'e9tect\'e9es et corrig\'e9es\par
+\par
+Recommandations pour la v1.4.0\par
+\par
+SECTION 11 \f1\emdash  REMARQUES DE V\f0\'c9RIFICATION\par
+L'utilisateur demande de v\'e9rifier et corriger les points suivants pendant la v1.3.0 :\par
+\par
+11.1 manifest.json \f1\emdash  finalisation apr\f0\'e8s swap\par
+Constat (remont\'e9 en v1.1.0) : le manifest pointe vers LocalAI.new (staging) au lieu de LocalAI\\ (produit final).\par
+\par
+Action : apr\'e8s le swap transactionnel, r\'e9\'e9crire le manifest avec le chemin final. Corriger root et generated_at.\par
+\par
+11.2 Coh\'e9rence des ports\par
+Constat : la v1.2.0 utilise 8080, 8090, 8091, 8092, 8093, 4000.\par
+\par
+Action : v\'e9rifier qu'aucun port n'entre en conflit, proposer un port alternatif si occup\'e9.\par
+\par
+11.3 Version coh\'e9rente\par
+Constat : v1.1.0 \f2\u8594?\f0  v1.2.0 \f2\u8594?\f0  v1.3.0. Incr\'e9ment strict.\par
+\par
+Action : mettre \'e0 jour __version__ dans install_localai_win.py et manifest.json.\par
+\par
+11.4 Profil mat\'e9riel persistant\par
+Nouveau : ajouter config\\hardware-profile.json pour \'e9viter de recalculer \'e0 chaque d\'e9marrage.\par
+\par
+Action : documenter dans INSTALLATION.md.\par
+\par
+SECTION 12 \f1\emdash  DEFINITION OF DONE (v1.3.0)\par
+La v1.3.0 est consid\f0\'e9r\'e9e comme aboutie lorsque :\par
+\par
+\f4\u9633?\f0  D\'e9tection GPU multi-constructeur fonctionnelle\par
+\f4\u9633?\f0  Binaire llama.cpp s\'e9lectionn\'e9 selon le GPU (CUDA / HIP / Vulkan / CPU)\par
+\f4\u9633?\f0  Calcul automatique de -ngl, threads, ctx\par
+\f4\u9633?\f0  Profils SOFT / NORMAL / HARD / AUTO / CUSTOM op\'e9rationnels\par
+\f4\u9633?\f0  config\\hardware-profile.json persistant\par
+\f4\u9633?\f0  S\'e9curit\'e9 VRAM (bascule CPU si insuffisance)\par
+\f4\u9633?\f0  Backends multi-modaux optimis\'e9s GPU\par
+\f4\u9633?\f0  Run-LocalAI.bat enrichi (profile, optimize, benchmark, set-profile)\par
+\f4\u9633?\f0  Benchmark CPU vs GPU document\'e9\par
+\f4\u9633?\f0  Mode b\'eata-testeur ex\'e9cut\'e9 int\'e9gralement\par
+\f4\u9633?\f0  dev/crash.log enrichi (cat\'e9gories GPU)\par
+\f4\u9633?\f0  dev/BETA_TEST_REPORT.md enrichi\par
+\f4\u9633?\f0  Remarques Section 11 corrig\'e9es\par
+\f4\u9633?\f0  AST au vert (z\'e9ro SyntaxWarning)\par
+\f4\u9633?\f0  Aucun processus zombie apr\'e8s arr\'eat\par
+\f4\u9633?\f0  manifest.json corrig\'e9 (chemin final)\par
+\f4\u9633?\f0  Version pass\'e9e \'e0 v1.3.0\par
+\f4\u9633?\f0  Une sauvegarde horodat\'e9e existe dans Installeur\\\par
+SECTION 13 \f1\emdash  INTERDICTIONS STRICTES (RAPPEL)\par
+\f4\u10060?\f0  Pas de packaging monolithique\par
+\par
+\f4\u10060?\f0  Pas de Docker\par
+\par
+\f4\u10060?\f0  Pas de WSL sauf dernier recours document\'e9\par
+\par
+\f4\u10060?\f0  Pas de sortie de sandbox (G:\\V1\\LocalAI-Projet\\)\par
+\par
+\f4\u10060?\f0  Pas d'improvisation sur la m\'e9thodologie\par
+\par
+\f4\u10060?\f0  Pas de suppression d\'e9finitive sans passage par old\\\par
+\par
+\f4\u10060?\f0  Pas de demande de validation interm\'e9diaire\par
+\par
+\f4\u10060?\f0  Pas de t\'e9l\'e9chargement hors sources autoris\'e9es sans justification dans DECISIONS.md\par
+\par
+\f4\u10060?\f0  Pas de passage du c\f5\u339?ur Go en Python\par
+\par
+\f4\u10060?\f0  Pas de binaire GPU incompatible (toujours v\'e9rifier la compatibilit\'e9 CUDA / driver)\par
+\par
+SECTION 14 \f1\emdash  SOURCES AUTORIS\f0\'c9ES (RAPPEL)\par
+llama.cpp (variantes GPU)\par
+\par
+{{\field{\*\fldinst{HYPERLINK https://github.com/ggml-org/llama.cpp/releases }}{\fldrslt{https://github.com/ggml-org/llama.cpp/releases\ul0\cf0}}}}\f0\fs22\par
+\par
+Fichiers : llama-bXXXXX-bin-win-cuda-12.4-x64.zip, llama-bXXXXX-bin-win-hip-radeon-x64.zip, llama-bXXXXX-bin-win-vulkan-x64.zip, llama-bXXXXX-bin-win-cpu-x64.zip\par
+\par
+CUDA Runtime\par
+\par
+{{\field{\*\fldinst{HYPERLINK https://github.com/ggml-org/llama.cpp/releases }}{\fldrslt{https://github.com/ggml-org/llama.cpp/releases\ul0\cf0}}}}\f0\fs22  (fichier cudart-llama-bin-win-cuda-12.4-x64.zip)\par
+\par
+whisper.cpp (variantes GPU)\par
+\par
+{{\field{\*\fldinst{HYPERLINK https://github.com/ggml-org/whisper.cpp/releases }}{\fldrslt{https://github.com/ggml-org/whisper.cpp/releases\ul0\cf0}}}}\f0\fs22\par
+\par
+stable-diffusion.cpp (variantes GPU)\par
+\par
+{{\field{\*\fldinst{HYPERLINK https://github.com/leejet/stable-diffusion.cpp/releases }}{\fldrslt{https://github.com/leejet/stable-diffusion.cpp/releases\ul0\cf0}}}}\f0\fs22\par
+\par
+Outils de d\'e9tection\par
+\par
+nvidia-smi (natif)\par
+\par
+rocm-smi (si AMD ROCm install\'e9)\par
+\par
+wmic path win32_VideoController (natif Windows)\par
+\par
+Sources communautaires (\'e0 documenter si utilis\'e9es)\par
+\par
+Tout fork ou build tiers doit \'eatre explicitement list\'e9 dans DECISIONS.md\par
+\par
+SECTION 15 \f1\emdash  COMPORTEMENT DE L'AGENT\par
+15.1 Autonomie totale\par
+Tu es en mode (a) : tu t\f0\'e9l\'e9charges tout, tu testes tout, tu livres. Tu ne demandes aucune validation interm\'e9diaire.\par
+\par
+15.2 Auto-healing\par
+Tu d\'e9tectes les anomalies, tu les corriges, tu re-testes. Tu ne laisses AUCUN bug derri\'e8re toi.\par
+\par
+15.3 Livraison\par
+Tu livres un produit fini :\par
+\par
+Le script ma\'eetre install_localai_win.py mis \'e0 jour en v1.3.0\par
+\par
+L'arborescence d\'e9ploy\'e9e LocalAI\\ optimis\'e9e GPU\par
+\par
+La documentation mise \'e0 jour\par
+\par
+Le rapport de b\'eata-test complet\par
+\par
+15.4 En cas de blocage\par
+Si tu rencontres un blocage technique majeur (binaire GPU incompatible, driver obsol\'e8te), tu documentes dans DECISIONS.md, tu proposes un fallback (CPU ou Vulkan), et tu poursuis.\par
+\par
+SECTION 16 \f1\emdash  CONFIRMATION\par
+Consid\f0\'e8re ce mandat d'\'e9volution comme ta loi pour la v1.3.0. Lis-le attentivement, confirme ta parfaite compr\'e9hension, puis lance le chantier de mani\'e8re 100 % autonome.\par
+\par
+Tu dois livrer un \'e9cosyst\'e8me d'inf\'e9rence local Windows optimis\'e9 GPU, dans une arborescence ouverte, modulaire et incr\'e9mentable, pr\'eat \'e0 \'eatre enrichi couche par couche sans jamais devoir d\'e9compiler un ex\'e9cutable.\par
+\par
+Commence maintenant.\lang12\par
+}
+ 

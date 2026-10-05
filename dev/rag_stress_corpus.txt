@@ -1,0 +1,18 @@
+﻿# TEST DE STRESS SÉMANTIQUE — AITRON V3 — ÉVALUATION PHYSIQUE
+## 1. Accents et Caractères Exotiques Français
+L'ingénieur a vérifié l'étanchéité du système l'été dernier à l'aube. Éléphants, ambiguïté, capharnaüm, où, Noël, garçon, cœur brisé.
+
+## 2. Structures Complexes et Code Source Imbriqué
+```python
+def failover_test_sse(retry=True):
+    # Interception de l'OOM GPU et replay déterministe
+    try:
+        buffer_size = 512 * 1024 # Blocs géométriques
+        stream_response(mode="translate", target="cloud")
+    except Exception as exc:
+        log_crash(category="GPU_VRAM", msg=f"Bascule SSE < 1.5s: {exc}")
+```
+
+## 3. Données Structurées Simulées (Format CSV/JSON)
+{"id": "node-01", "type": "fichier", "degree": 4, "relations": ["imports", "surveille"]}
+192.168.1.42	[PII-EMAIL-1]	active_variant=vulkan

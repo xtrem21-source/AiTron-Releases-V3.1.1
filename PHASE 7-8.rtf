@@ -1,0 +1,84 @@
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1036{\fonttbl{\f0\fnil\fcharset0 Calibri;}{\f1\fnil Calibri;}{\f2\fnil\fcharset1 Segoe UI Symbol;}}
+{\*\generator Riched20 10.0.29639}\viewkind4\uc1 
+\pard\sa200\sl276\slmult1\f0\fs22\lang12 MANDAT TECHNIQUE ET DIRECTIVE D'EX\'c9CUTION GLOBALE ET S\'c9QUENTIELLE \f1\emdash  VERSIONS v1.7.0 & v1.8.0\par
+Sandbox cible : G:\\V1\\LocalAI-Projet\\\par
+Version d'origine : v1.6.0 \f2\u10132?\f0  Version finale vis\'e9e : v1.8.0 (Incr\'e9mentation par jalons \'e9tanches)\par
+\par
+Bonjour Cline. Tu agis en tant qu'Ing\'e9nieur principal en Assurance Qualit\'e9 (QA) global et D\'e9veloppeur Senior Full-Stack. Ce mandat unifi\'e9 est ta feuille de route exclusive pour concevoir, impl\'e9menter et valider les versions v1.7.0 et v1.8.0 de notre \'e9cosyst\'e8me LocalAI natif sous Windows, sans Docker et sans WSL.\par
+\par
+Tu as l'obligation absolue de respecter notre charte constitutionnelle (CHARTE.md). Tu op\'e8res en autonomie totale (mode a) : tu installes, tu codes, tu testes et tu appliques l'auto-healing jusqu'\'e0 l'obtention d'un produit irr\'e9prochable.\par
+\par
+================================================================================\par
+ PROTOCOLE S\'c9QUENTIEL \'c0 JALONS EXCLUSIFS AVEC "STOP" OBLIGATOIRE\par
+================================================================================\par
+Tu as l'interdiction stricte de coder tout le mandat d'un coup. Tu dois suivre cette chronologie exacte :\par
+- JALON 0 : Sauvegarde ante-ex\'e9cution.\par
+- JALON 1 : Mode B\'eata-Testeur Fou sur la v1.6.0 active (STOP complet et validation compl\'e8te de l'existant).\par
+- JALON 2 : Impl\'e9mentation compl\'e8te de la v1.7.0 (Quantization locale + Filtre PII Hybride Best-Effort).\par
+- JALON 3 : Mode B\'eata-Testeur Fou sur la v1.7.0 (STOP complet, validation physique et consolidation avant v1.8.0).\par
+- JALON 4 : Impl\'e9mentation compl\'e8te de la v1.8.0 (Routage h\'e9t\'e9rog\'e8ne NPU via DirectML + Fallback CPU).\par
+- JALON 5 : Mode B\'eata-Testeur Fou final sur la v1.8.0 (STOP complet, rapport final, consolidation et gel).\par
+\par
+================================================================================\par
+JALON 0 & 1 \f1\emdash  SAUVEGARDE ET TEST DE RUPTURE INITIAL (STOP OBLIGATOIRE)\par
+================================================================================\par
+1. SAUVEGARDE ANTE-EX\f0\'c9CUTION : Appelle imm\'e9diatement la routine 'archive_installer()' au sommet de ton main() pour copier le script ma\'eetre 'install_localai_win.py' vers 'Installeur\\' au format horodat\'e9 strict (.py.txt).\par
+2. MODE B\'caTA-TESTEUR FOU PR\'c9-CODE (STOP) : Fais un arr\'eat complet. Avant d'\'e9crire le code de la v1.7.0, \'e9prouve l'infrastructure v1.6.0 actuelle dans toutes ses dimensions (Inf\'e9rence texte, Vision, requ\'eates RAG/GraphRAG, connectivit\'e9 des ports 4000, 8080, 8090, et bascule du Failover). Si une anomalie ou une r\'e9gression est d\'e9tect\'e9e, applique l'auto-healing imm\'e9diatement avant de poursuivre.\par
+\par
+================================================================================\par
+JALON 2 & 3 \f1\emdash  VERSION v1.7.0 : QUANTIZATION LOCALE & FILTRE PII HYBRIDE CONFIGURABLE\par
+================================================================================\par
+Une fois le Jalon 1 valid\f0\'e9 au vert, passe \'e0 l'impl\'e9mentation exclusive de la v1.7.0 :\par
+\par
+1. QUANTIZATION ADAPTATIVE D\'c9DI\'c9E :\par
+   - Int\'e8gre le support du binaire 'llama-quantize.exe' (d\'e9j\'e0 pr\'e9sent dans llama.cpp) au sein de ton orchestrateur Python.\par
+   - Ajoute la commande CLI 'Run-LocalAI.bat quantize <chemin_modele_f16> <type_quant>' (ex: Q4_K_M, Q8_0) pour ex\'e9cuter la compression de mod\'e8le de mani\'e8re asynchrone et s\'e9curis\'e9e.\par
+\par
+2. FILTRE DE CONFIDENTIALIT\'c9 PII HYBRIDE AVEC CLAUSE DE TRANSPARENCE (BEST-EFFORT) :\par
+   - Pour \'e9viter le risque de fausse s\'e9curit\'e9 d'un filtrage par simples expressions r\'e9guli\'e8res, d\'e9veloppe un module hybride de d\'e9tection dans ton Token Saver Python :\par
+     * Niveau 1 (Regex d\'e9terministes) : Capture stricte des formats standards (Emails, adresses IP, cl\'e9s d'API connues comme sk-, ghp_, et structures JWT).\par
+     * Niveau 2 (Heuristiques d'entropie) : Analyse de l'entropie des cha\'eenes de caract\'e8res pour intercepter les mots de passe complexes et cl\'e9s custom en clair.\par
+     * Niveau 3 (NER local l\'e9ger) : Utilise l'infrastructure locale (via un appel interne discret \'e0 un mod\'e8le de Token Classification miniature de moins de 50 Mo r\'e9f\'e9renc\'e9 dans le catalogue) pour isoler s\'e9mantiquement les entit\'e9s nomm\'e9es complexes (Noms, adresses) sans framework lourd.\par
+   - S\'c9CURIT\'c9 ET AUDIT DE L'UTILISATEUR :\par
+     * Le filtre PII doit \'eatre explicitement document\'e9 dans 'INSTALLATION.md' comme une protection "Best-Effort", et non comme une garantie d'\'e9tanch\'e9it\'e9 absolue \'e0 100%.\par
+     * Cr\'e9e le drapeau d'activation `--no-pii-filter` dans ton proxy pour permettre \'e0 l'utilisateur de d\'e9sactiver le filtre s'il le souhaite.\par
+     * Chaque op\'e9ration de masquage (Redaction) et son type de token doivent \'eatre journalis\'e9s de fa\'e7on transparente dans 'dev\\crash.log' (cat\'e9gorie PRIVACY_FILTER) \'e0 des fins d'audit de s\'e9curit\'e9.\par
+\par
+3. MODE B\'caTA-TESTEUR FOU v1.7.0 (STOP) : Fais un nouveau STOP complet. \'c9prouve intensivement ta brique v1.7.0 :\par
+   - Valide le masquage/d\'e9masquage d'un prompt de test contenant une cl\'e9 API et des adresses IPs lors d'un d\'e9bordement cloud simul\'e9. V\'e9rifie la propret\'e9 des logs d'audit.\par
+   - \'c9cris la r\'e9ussite dans 'dev\\patch_integrity.log', passe la version globale et le manifest \'e0 "v1.7.0" et mets \'e0 jour 'INSTALLATION.md'.\par
+\par
+================================================================================\par
+JALON 4 & 5 \f1\emdash  VERSION v1.8.0 : ROUTAGE H\f0\'c9T\'c9ROG\'c8NE NPU (LAYERS UNIFI\'c9S VIA DIRECTML)\par
+================================================================================\par
+N'encha\'eene cette \'e9tape que si le jalon pr\'e9c\'e9dent est consolid\'e9 au vert stable \'e0 100%.\par
+\par
+1. ACC\'c9L\'c9RATION UNIVERSELLE WINDOWS NPU SANS SDK CONSTRUCTEUR :\par
+   - Pour contourner l'immaturit\'e9 d'ONNX Runtime GenAI pur face \'e0 l'architecture AMD XDNA2 sous Windows, installe le provider d'acc\'e9l\'e9ration DirectML de Microsoft de mani\'e8re isol\'e9e : `pip install onnxruntime-directml --target LocalAI\\runtime\\python\\Lib\\site-packages`.\par
+   - DirectML agissant comme une couche de virtualisation de calcul native de Windows, configure ton orchestrateur pour adresser les t\'e2ches d'extraction s\'e9mantique (RAG/GraphRAG) et les outils l\'e9gers du serveur MCP vers ce provider universel :\par
+     * Priorit\'e9 1 : Ex\'e9cution mat\'e9rielle NPU Intel (via l'architecture DirectML/OpenVINO native sous Windows 11).\par
+     * Priorit\'e9 2 : Tentative d'activation sur NPU AMD Ryzen AI (XDNA2) exploitant les couches DirectML unifi\'e9es.\par
+     * Fallback obligatoire (S\'e9curit\'e9 QA) : Si le mat\'e9riel de la machine ou les pilotes graphiques ne permettent pas l'initialisation du binaire DirectML sur le NPU, le script doit basculer automatiquement et de mani\'e8re totalement transparente sur le CPU (profil SOFT/AUTO adapt\'e9), en consignant un avertissement explicite dans 'dev\\crash.log' (cat\'e9gorie GPU_DETECT).\par
+\par
+2. COMMANDES CLI ENRICHIES :\par
+   - 'Run-LocalAI.bat hardware-status' : Affiche la r\'e9partition exacte des charges d'inf\'e9rence (Moteur principal GPU vs T\'e2ches s\'e9mantiques d\'e9port\'e9es sur le NPU/CPU).\par
+\par
+3. MODE B\'caTA-TESTEUR FOU FINAL v1.8.0 (STOP) : \'c9prouve l'int\'e9gralit\'e9 du syst\'e8me combin\'e9 :\par
+   - Simule l'absence de pilote NPU compatible DirectML, valide que ton auto-healing bascule proprement le RAG sur le CPU sans faire planter la session utilisateur.\par
+   - V\'e9rifie la lib\'e9ration totale de la m\'e9moire et de la VRAM \'e0 l'arr\'eat g\'e9n\'e9ral (z\'e9ro zombie).\par
+4. CONSOLIDATION ET LIVRAISON : \'c9cris le rapport final d'\'e9valuation complet dans 'dev\\BETA_TEST_REPORT.md', valide ton AST, passe la version finale globale \'e0 "v1.8.0" partout et g\'e9n\'e8re ta sauvegarde de cl\'f4ture dans 'Installeur\\'. STOP complet en fin de traitement.\par
+\par
+================================================================================\par
+CLAUSE D'AUTO-R\'c9GULATION (S\'c9CURIT\'c9 DE CONTEXTE ET DE CHARGE COGNITIVE)\par
+================================================================================\par
+Si tu estimes, en cours de route, que la charge du Jalon 2 (v1.7.0) ou du Jalon 4 (v1.8.0) d\'e9passe ta capacit\'e9 de traitement ou les limites de ta fen\'eatre de contexte en un seul passage, tu es explicitement autoris\'e9 \'e0 subdiviser chaque jalon en sous-\'e9tapes internes (ex : v1.7.0a Quantize, v1.7.0b Privacy).\par
+\par
+Si tu choisis cette option :\par
+1. Documente imm\'e9diatement ce choix et sa justification technique dans 'dev\\DECISIONS.md'.\par
+2. Livre et valide la sous-\'e9tape en cours au vert \'e0 travers ton protocole de test avant de passer \'e0 la suivante.\par
+3. Encha\'eene ensuite de mani\'e8re autonome sur la suite pour compl\'e9ter le mandat v1.8.0 global.\par
+La doctrine transactionnelle reste inchang\'e9e \'e0 chaque \'e9tape : sauvegarde ante-ex\'e9cution, patch chirurgical, test et validation AST.\par
+\par
+Ex\'e9cute l'int\'e9gralit\'e9 de ce grand chantier de mani\'e8re autonome et livre la version v1.8.0 stabilis\'e9e au vert. Tu peux commencer.\par
+}
+ 

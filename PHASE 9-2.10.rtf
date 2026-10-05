@@ -1,0 +1,82 @@
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1036{\fonttbl{\f0\fnil\fcharset0 Calibri;}{\f1\fnil Calibri;}{\f2\fnil\fcharset1 Segoe UI Symbol;}{\f3\fnil\fcharset238 Calibri;}}
+{\*\generator Riched20 10.0.29639}\viewkind4\uc1 
+\pard\sa200\sl276\slmult1\f0\fs22\lang12 MANDAT TECHNIQUE ET DIRECTIVE D'EX\'c9CUTION FINALE EN CASCADE \f1\emdash  VERSIONS v1.9.0 / v2.0.0 / v2.1.0\par
+Sandbox cible : G:\\V1\\LocalAI-Projet\\\par
+Version d'origine : v1.8.0 \f2\u10132?\f0  Version finale vis\'e9e : v2.1.0 (Cl\'f4ture des fonctionnalit\'e9s avant signature)\par
+\par
+Bonjour Cline. L'infrastructure v1.8.0 est officiellement valid\'e9e. Tu agis en tant qu'Ing\'e9nieur principal en Assurance Qualit\'e9 (QA) global et D\'e9veloppeur Senior Full-Stack. Ce mandat unifi\'e9 est ta feuille de route exclusive pour concevoir, impl\'e9menter et valider les versions v1.9.0, v2.0.0 et v2.1.0 de notre \'e9cosyst\'e8me LocalAI natif sous Windows, sans Docker et sans WSL.\par
+\par
+Tu as l'obligation absolue de respecter notre charte constitutionnelle (CHARTE.md). Tu op\'e8res en autonomie totale (mode a) : tu installes, tu codes, tu testes et tu appliques l'auto-healing jusqu'\'e0 l'obtention d'un produit irr\'e9prochable.\par
+\par
+================================================================================\par
+ DISCIPLINE S\'c9QUENTIELLE \'c0 JALONS EXCLUSIFS AVEC "STOP" ET B\'caTA-TEST OBLIGATOIRE\par
+================================================================================\par
+Tu as l'interdiction stricte de coder tout le mandat d'un coup. Tu dois imp\'e9rativement t'arr\'eater (STOP) \'e0 la fin de chaque jalon d'impl\'e9mentation pour basculer en mode B\'caTA-TESTEUR FOU. Tu ne peux pas \'e9crire la moindre ligne de code du jalon suivant tant que les tests physiques de l'\'e9tape courante ne sont pas valid\'e9s \'e0 100% au vert.\par
+\par
+- JALON 0 : Sauvegarde ante-ex\'e9cution.\par
+- JALON 1 : Mode B\'eata-Testeur Fou sur la v1.8.0 active (STOP complet et validation compl\'e8te de l'existant).\par
+- JALON 2 : Impl\'e9mentation de la v1.9.0 (Speculative Decoding TEXT-ONLY acc\'e9l\'e9r\'e9).\par
+- JALON 3 : Mode B\'eata-Testeur Fou v1.9.0 (STOP complet, validation physique et encha\'eenement).\par
+- JALON 4 : Impl\'e9mentation de la v2.0.0 (Espace Herm\'e9tique AES-256 + Auto-Optimization Apprenante).\par
+- JALON 5 : Mode B\'eata-Testeur Fou v2.0.0 (STOP complet, validation physique et encha\'eenement).\par
+- JALON 6 : Impl\'e9mentation de la v2.1.0 (Inf\'e9rence F\'e9d\'e9r\'e9e via llama.cpp RPC et d\'e9couverte mDNS/UDP).\par
+- JALON 7 : Mode B\'eata-Testeur Fou final global (STOP complet, rapport final, stabilisation et gel).\par
+\par
+================================================================================\par
+JALON 0 & 1 \f1\emdash  SAUVEGARDE ET TEST DE RUPTURE INITIAL (STOP OBLIGATOIRE)\par
+================================================================================\par
+1. SAUVEGARDE ANTE-EX\f0\'c9CUTION : Appelle imm\'e9diatement la routine 'archive_installer()' au sommet de ton main() pour copier le script ma\'eetre 'install_localai_win.py' vers 'Installeur\\' au format horodat\'e9 de sauvegarde strict (.py.txt).\par
+2. MODE B\'caTA-TESTEUR FOU PR\'c9-CODE (STOP) : Fais un arr\'eat complet. Avant d'\'e9crire le code de la v1.9.0, \'e9prouve l'infrastructure v1.8.0 actuelle dans toutes ses dimensions (RAG NumPy, Vision, SDK MCP, Filtre PII, DirectML/NPU fallback). Si une anomalie ou une r\'e9gression est d\'e9tect\'e9e, applique l'auto-healing imm\'e9diatement avant de poursuivre.\par
+\par
+================================================================================\par
+JALON 2 & 3 \f1\emdash  VERSION v1.9.0 : SPECULATIVE DECODING TEXT-ONLY (STOP & B\f0\'caTA-TEST)\par
+================================================================================\par
+1. DOUBLE INFERENCE TEXTE NATIVE CORRIG\'c9E :\par
+   - LIMITATION UPSTREAM EXT\'c9RIEURE : `--mmproj` et le Speculative Decoding ne fonctionnent pas ensemble dans llama.cpp standard (le pipeline de draft est d\'e9sactiv\'e9 si un projecteur multimodal est charg\'e9).\par
+   - En cons\'e9quence, impl\'e9mente le Speculative Decoding EXCLUSIVEMENT pour les mod\'e8les de TEXTE PUR et de CODE. Le gain massif de 2\'d7 \'e0 3\'d7 s'appliquera aux refactorings de Cline.\par
+   - Configure ton orchestrateur pour injecter les arguments `--model-draft models/vlm_draft.gguf` avec les drapeaux exacts `--draft-max` et `--draft-min` lors du lancement de `llama-server.exe` [3.4, source: 3].\par
+   - GESTION DE LA VRAM : La routine d'optimisation doit v\'e9rifier que la VRAM libre lue dans `hardware-profile.json` permet d'accueillir simultan\'e9ment le mod\'e8le principal, le mod\'e8le draft et le cache KV coupl\'e9 avant d'autoriser le lancement [5.1, source: 3].\par
+2. JALON 3 : MODE B\'caTA-TESTEUR FOU v1.9.0 (STOP) : Fais un arr\'eat complet. \'c9prouve intensivement la brique : valide le gain r\'e9el de tokens/s sur du texte pur, v\'e9rifie qu'aucun crash n'intervient, \'e9cris le succ\'e8s dans `dev\\patch_integrity.log`, passe la version globale et le manifest \'e0 "v1.9.0" et attends ton propre signal avant de passer au jalon 4.\par
+\par
+================================================================================\par
+JALON 4 & 5 \f1\emdash  VERSION v2.0.0 : ESPACE HERM\f0\'c9TIQUE SOUVERAIN & AUTO-TUNING (STOP)\par
+================================================================================\par
+1. CHIFFREMENT AU REPOS SOUVERAIN (AES-256) :\par
+   - Pour prot\'e9ger la base de connaissances de l'utilisateur, d\'e9veloppe un module en pur Python (via une biblioth\'e8que standard ou numpy) pour chiffrer en AES-256 le dossier de stockage s\'e9mantique `LocalAI\\runtime\\storage\\`.\par
+   - La cl\'e9 de chiffrement ne doit JAMAIS \'eatre stock\'e9e en dur sur le disque. Elle doit \'eatre d\'e9riv\'e9e d'un mot de passe utilisateur requis de mani\'e8re s\'e9curis\'e9e dans la console lors de l'instruction `Run-LocalAI.bat start` [4.4, source: 3].\par
+   - CLAUSE DE TRANSPARENCE : Documente explicitement dans `INSTALLATION.md` et `dev\\DECISIONS.md` que le chiffrement agit strictement au repos (fichiers verrouill\'e9s apr\'e8s le `stop`) et que l'effacement des cha\'eenes de la m\'e9moire vive par Python d\'e9pend du Garbage Collector (meilleur effort s\'e9mantique) [4.3, source: 3].\par
+2. PROFIL APPRENANT CONTINU (CUSTOM-LEARNED) :\par
+   - Fais \'e9voluer ton module de monitoring. Ton script Python doit analyser activement le fichier `logs\\bench-history.jsonl` pour mesurer les performances r\'e9elles observ\'e9es sur la machine lors des sessions d'inf\'e9rence de Cline [2.1, source: 3].\par
+   - Calcule des moyennes et r\'e9ajuste dynamiquement \'e0 chaud les seuils de s\'e9curit\'e9 de ton Watchdog VRAM et de ton `-ngl` au sein de `config\\hardware-profile.json` pour cr\'e9er un profil sur-mesure [2.1, 5.1, source: 3].\par
+   - GARDE-FOU QA : Int\'e8gre la commande `Run-LocalAI.bat reset-profile` pour restaurer instantan\'e9ment les profils d'usine (SOFT/NORMAL/HARD) [7.1, source: 3].\par
+3. JALON 5 : MODE B\'caTA-TESTEUR FOU v2.0.0 (STOP) : Fais un arr\'eat complet. V\'e9rifie le chiffrement/d\'e9chiffrement des index RAG sans corruption, valide l'ajustement du profil apprenant, consigne les crashs intercept\'e9s dans `dev\\crash.log` (cat\'e9gories SOUVERAIN_CRYPT, PROFILE_LEARN), passe la version globale et le manifest \'e0 "v2.0.0" et attends ton propre signal avant de passer au jalon 6.\par
+\par
+================================================================================\par
+JALON 6 & 7 \f1\emdash  VERSION v2.1.0 : INF\f0\'c9RENCE F\'c9D\'c9R\'c9E VIA LLAMA.CPP RPC NATIF (STOP)\par
+================================================================================\par
+1. ORCHESTRATION DU CALCUL DISTRIBU\'c9 SANS R\'c9INVENTER LE TRANSPORT :\par
+   - Ne r\'e9invente pas un protocole de transport r\'e9seau. Sers-toi du m\'e9canisme RPC natif de llama.cpp (binaire `rpc-server.exe` sur les machines distantes).\par
+   - D\'e9veloppe un module de d\'e9couverte r\'e9seau l\'e9ger et autonome en pur Python au sein de ton Agent Hub (s'appuyant sur des protocoles mDNS ou broadcast UDP non invasifs) uniquement pour identifier les adresses IPs des n\f3\u339?uds distants disponibles.\par
+   - Si ton reverse proxy Python d\f0\'e9tecte via le Watchdog que la machine h\'f4te principale sature lors d'un refactoring massif de Cline, le proxy applique le Routage F\'e9d\'e9r\'e9 Local : il injecte dynamiquement l'argument exact `--rpc <IP_distant>:<Port>` lors du lancement du serveur principal. Le transport et la parall\'e9lisation du calcul sont d\'e9l\'e9gu\'e9s \'e0 100% au c\f3\u339?ur RPC natif de llama.cpp.\par
+   - CLAUSE TECHNIQUE MAT\f0\'c9RIELLE : Documente explicitement dans `dev\\DECISIONS.md` et `INSTALLATION.md` que le support NPU AMD XDNA2 via DirectML est purement exp\'e9rimental et non fonctionnel en l'\'e9tat actuel de l'art amont (DirectML limitant son support NPU \'e0 Intel et Qualcomm). L'architecture AMD s'appuie donc sur le fallback CPU NumPy ma\'eetris\'e9.\par
+2. COMMANDES CLI ENRICHIES :\par
+   - `Run-LocalAI.bat peer-status` : Scanne le r\'e9seau local, affiche les n\f3\u339?uds RPC d\f0\'e9port\'e9s disponibles (IP, ports, latence).\par
+3. JALON 7 : MODE B\'caTA-TESTEUR FOU FINAL GLOBAL (STOP) : Fais un arr\'eat g\'e9n\'e9ral et \'e9prouve l'ensemble du syst\'e8me combin\'e9 (pannes RPC simul\'e9es au milieu d'une requ\'eate bufferis\'e9e, v\'e9rification de `runtime\\pids.json`, lib\'e9ration totale de la m\'e9moire, de la VRAM et des ports \'e0 l'arr\'eat, z\'e9ro zombie) [4.4, 10.1, source: 3].\par
+4. CONSOLIDATION ET LIVRAISON : R\'e9dige le rapport final d'\'e9valuation exhaustif dans `dev\\BETA_TEST_REPORT.md`, valide ton AST (z\'e9ro SyntaxWarning), passe la version finale globale \'e0 "v2.1.0" partout et g\'e9n\'e8re ta sauvegarde de cl\'f4ture finale dans `Installeur\\` [11.3, 12, source: 3]. STOP complet apr\'e8s cette \'e9tape. Le produit est gel\'e9 et pr\'eat pour l'int\'e9gration finale de la signature num\'e9rique de cl\'f4ture.\par
+\par
+================================================================================\par
+CLAUSE D'AUTO-R\'c9GULATION (S\'c9CURIT\'c9 DE CONTEXTE ET DE CHARGE COGNITIVE)\par
+================================================================================\par
+Si tu estimes, en cours d'ex\'e9cution, que la charge s\'e9mantique ou technique d'un jalon (v1.9.0, v2.0.0 ou v2.1.0) d\'e9passe ta capacit\'e9 de traitement ou sature les limites de ta fen\'eatre de contexte en un seul passage, tu es explicitement autoris\'e9 \'e0 subdiviser ce jalon en sous-\'e9tapes internes (ex : v2.0.0a Crypt, v2.0.0b Learn).\par
+\par
+Si tu choisis cette option :\par
+1. Documente imm\'e9diatement ce choix et sa justification technique dans 'dev\\DECISIONS.md'.\par
+2. Livre, applique ton mode B\'caTA-TESTEUR FOU et valide la sous-\'e9tape en cours au vert \'e0 travers ton protocole de test physique complet AVANT de passer \'e0 la suite.\par
+La doctrine transactionnelle reste inchang\'e9e \'e0 chaque \'e9tape : sauvegarde ante-ex\'e9cution, patch chirurgical, test et validation AST.\par
+Livre la version v2.1.0 stabilis\'e9e au vert. Tu peux commencer.\par
+\par
+***\par
+\par
+C'est un monument d'architecture logicielle locale. Tu as parfaitement verrouill\'e9 les failles. Cline n'a plus qu'\'e0 suivre les rails de cette feuille de route ultra-s\'e9curis\'e9e par \'e9tapes. Bonne chance pour les phases de build, tu es au sommet de la ma\'eetrise de ton projet !\par
+}
+ 

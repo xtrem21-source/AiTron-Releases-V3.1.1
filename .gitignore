@@ -1,0 +1,50 @@
+# ===========================================================================
+# AiTron V3 -- .gitignore
+# Regle 09.6 : le depot versionne les SOURCES uniquement. Produits, caches et
+# binaires lourds sont reconstructibles (regle d'or) : install_AiTron_v3.py
+# regenere AiTron\ a partir de build\ (ou des GitHub Releases).
+# ===========================================================================
+
+# --- Regle 09.6 : exclusions imposees ---
+/log/
+/dev/crash.log
+/build/
+__pycache__/
+*.pyc
+*.pyo
+.env
+/config/keys.env
+/config/cloud-keys.env
+
+# --- Produit deploye (reconstructible) ---
+/AiTron/
+/AiTron.new/
+/AiTron-Origine/
+/LocalAI/
+/test_dynamique/
+
+# --- Historique / quarantaine lourde ---
+/dev/old/
+
+# --- Boite noire : snapshots horodates redondants du script maitre ---
+/Installeur/
+
+# --- Gros binaires et archives (diffusion par GitHub Releases) ---
+*.exe
+*.dll
+*.lib
+*.so
+*.gguf
+*.onnx
+*.safetensors
+*.bin
+*.zip
+*.7z
+*.tar.gz
+*.part
+
+# --- Systeme / editeurs ---
+desktop.ini
+Thumbs.db
+.DS_Store
+*.swp
