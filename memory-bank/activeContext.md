@@ -4,8 +4,8 @@
 2026-10-05
 
 ## Version actuelle
-- **Produit stable** : v3.1.2 (binaires GitHub Releases)
-- **Version en cours** : aucune — v3.1.2 livrée, testée et documentée
+- **Produit stable** : v3.1.3 (Release GitHub v3.1.2)
+- **Version en cours** : aucune — v3.1.3 livrée (mandat Release GitHub v3.1.2 achevé)
 - **Certificat** : `CHECK_DE_CONTRÔLE_FINAL.log` — CERTIFICATION v3.1.0 VALIDÉE AU VERT
 
 ## Travail en cours
@@ -14,13 +14,14 @@ GitHub Releases) sont livrés, testés en conditions réelles et documentés.
 
 ## Prochaines étapes
 1. [FAIT] Dépôt Git publié : `main` + tag `v3.1.2` (GitHub xtrem21-source/AiTron-Releases-V3.1.1)
-2. Release GitHub : binaires v3.1.1 déjà hébergés (byte-identiques ; aucun nouvel asset requis)
+2. [FAIT] Release GitHub v3.1.2 publiée (binaires local-ai.exe + cloud-proxy.exe)
 3. Signature numérique (SignPath) et segmentation des binaires (limite GitHub 25 Mo/fichier)
 
 ## Décisions récentes
 - **D-049** : portabilité totale — détection dynamique du répertoire (+ option `--root`)
 - **D-050** : fallbacks de téléchargement + garde-fou d'intégrité PE « MZ »
 - **D-051** : intégration des binaires GitHub Releases (URLs pérennes + SHA-256)
+- **D-052** : création de la Release GitHub v3.1.2 (upload via gh CLI)
 
 ## Anomalies en cours
 Voir `ANOMALIES_NON_RÉSOLUES.log`. L'anomalie `FALLBACK_DOWNLOAD` (URLs HTML de v3.1.1) est

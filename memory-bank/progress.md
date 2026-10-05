@@ -22,6 +22,7 @@
 | v3.1.0 | Certification validée | ✅ |
 | v3.1.1 | Portabilité installeur (détection dynamique + fallbacks) | ✅ |
 | v3.1.2 | Binaires GitHub Releases (URLs pérennes + SHA-256) | ✅ |
+| v3.1.3 | Release GitHub v3.1.2 (upload via gh CLI + fallbacks à jour) | ✅ |
 
 ## Ce qui marche
 
@@ -71,7 +72,7 @@
 
 ### Court terme
 - [x] Publier le dépôt Git (commit initial + tag `v3.1.2`) — FAIT (main + tag sur GitHub)
-- [x] Release GitHub — binaires v3.1.1 déjà hébergés (byte-identiques)
+- [x] Release GitHub v3.1.2 créée (gh CLI) — binaires hébergés
 
 ### Moyen terme
 - [ ] Signature numérique (SignPath, gratuit pour open-source)

@@ -30,7 +30,7 @@ import tempfile
 import time
 import urllib.request
 
-__version__ = "3.1.2"
+__version__ = "3.1.3"
 
 # ---------------------------------------------------------------------------
 # Constantes globales
@@ -139,8 +139,8 @@ BRIDGE_EXE = "cloud-proxy.exe"
 # deploye -> telechargement GitHub Releases (URLs PERENNES + SHA-256 ci-dessous).
 # Le garde-fou d'integrite PE "MZ" est CONSERVE (applique a tout .exe telecharge).
 # ---------------------------------------------------------------------------
-FALLBACK_LOCAL_AI_URL        = "https://github.com/xtrem21-source/AiTron-Releases-V3.1.1/releases/download/v3.1.1/local-ai.exe"
-FALLBACK_CLOUD_PROXY_URL     = "https://github.com/xtrem21-source/AiTron-Releases-V3.1.1/releases/download/v3.1.1/cloud-proxy.exe"
+FALLBACK_LOCAL_AI_URL        = "https://github.com/xtrem21-source/AiTron-Releases-V3.1.1/releases/download/v3.1.2/local-ai.exe"
+FALLBACK_CLOUD_PROXY_URL     = "https://github.com/xtrem21-source/AiTron-Releases-V3.1.1/releases/download/v3.1.2/cloud-proxy.exe"
 FALLBACK_LOCAL_AI_SHA256     = "0F55C48379F971A6108339C9D90291A76D8DD21CDCE283AD8EF972C4E3855B34"
 FALLBACK_CLOUD_PROXY_SHA256  = "BFCB28047F97F4DD4D6374938971BAA2F2711BFA6992C866EEED078B88F50F0C"
 

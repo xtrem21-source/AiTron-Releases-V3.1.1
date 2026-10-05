@@ -4,7 +4,7 @@
 > **Français** → [`INSTALLATION.fr.md`](INSTALLATION.fr.md) · **English** → [`INSTALLATION.en.md`](INSTALLATION.en.md)
 > The interface itself follows the active language: `AiTron\Run-LocalAI.bat lang fr` / `lang en`.
 >
-> **Version v3.1.2** · **AiTron V3** — fork indépendant de LocalAI (licence MIT), enrichi d'une couche
+> **Version v3.1.3** · **AiTron V3** — fork indépendant de LocalAI (licence MIT), enrichi d'une couche
 > d'orchestration souveraine pour Windows. **Il n'est aucunement affilié au projet LocalAI officiel.**
 > Le moteur conserve son nom d'origine (`local-ai.exe`) : seul le produit s'appelle AiTron V3.
 
@@ -57,8 +57,8 @@ L'installeur est **portable** : lance-le depuis n'importe quel dossier (clé USB
 `D:\Projets\AiTron\`). La sandbox est le **dossier du script** ; l'option **`--root <chemin>`**
 impose un autre répertoire cible. Si `local-ai.exe` / `cloud-proxy.exe` sont absents de `build\out\`,
 ils sont repris du **staging archivé** (`dev\old\test_dynamique\AiTron\`), sinon **téléchargés** :
-- `local-ai.exe`    : `https://github.com/xtrem21-source/AiTron-Releases-V3.1.1/releases/download/v3.1.1/local-ai.exe`  (SHA-256 `0F55C483…`)
-- `cloud-proxy.exe` : `https://github.com/xtrem21-source/AiTron-Releases-V3.1.1/releases/download/v3.1.1/cloud-proxy.exe`  (SHA-256 `BFCB2804…`)
+- `local-ai.exe`    : `https://github.com/xtrem21-source/AiTron-Releases-V3.1.1/releases/download/v3.1.2/local-ai.exe`  (SHA-256 `0F55C483…`)
+- `cloud-proxy.exe` : `https://github.com/xtrem21-source/AiTron-Releases-V3.1.1/releases/download/v3.1.2/cloud-proxy.exe`  (SHA-256 `BFCB2804…`)
 > **URLs GitHub Releases** (pérennes, binaires directs). Le **SHA-256** des binaires est **vérifié** et le
 > **garde-fou PE `MZ`** s'applique à tout `.exe` téléchargé, avec ou sans somme attendue.
 
@@ -111,8 +111,8 @@ The installer is **portable**: run it from any folder (USB stick, `C:\AiTron\`, 
 The sandbox is the **script's folder**; **`--root <path>`** overrides the target. If `local-ai.exe` /
 `cloud-proxy.exe` are missing from `build\out\`, they are taken from the **archived staging**
 (`dev\old\test_dynamique\AiTron\`), otherwise **downloaded** from:
-- `local-ai.exe`    : `https://github.com/xtrem21-source/AiTron-Releases-V3.1.1/releases/download/v3.1.1/local-ai.exe`  (SHA-256 `0F55C483…`)
-- `cloud-proxy.exe` : `https://github.com/xtrem21-source/AiTron-Releases-V3.1.1/releases/download/v3.1.1/cloud-proxy.exe`  (SHA-256 `BFCB2804…`)
+- `local-ai.exe`    : `https://github.com/xtrem21-source/AiTron-Releases-V3.1.1/releases/download/v3.1.2/local-ai.exe`  (SHA-256 `0F55C483…`)
+- `cloud-proxy.exe` : `https://github.com/xtrem21-source/AiTron-Releases-V3.1.1/releases/download/v3.1.2/cloud-proxy.exe`  (SHA-256 `BFCB2804…`)
 > **GitHub Releases URLs** (permanent, direct binaries). The binary **SHA-256** is **verified** and the
 > **PE `MZ` safeguard** applies to every downloaded `.exe`, with or without an expected checksum.
 

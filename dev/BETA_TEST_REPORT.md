@@ -653,3 +653,19 @@ Ordre correct : **écarter → installer → purger**, jamais *purger → instal
   re-telechargement massif de la pile Python/modeles) ; mecanisme d'installation inchange. Rendu
   navigateur non verifie.
 - **Verdict : v3.1.2 LIVREE — binaires GitHub Releases integres, VALIDEE AU VERT.**
+
+## 52. v3.1.3 — Creation de la Release GitHub v3.1.2 (2026-10-05)
+- **Objet** : publier la Release GitHub v3.1.2 (binaires) et basculer les URLs de fallback sur v3.1.2.
+- **Methode** : GitHub CLI (`gh`) installe via `winget`, authentifie par le jeton GCM (`GH_TOKEN`) ;
+  release creee en ligne de commande (l'interface web bloquait les gros fichiers). Patch transactionnel
+  du script (D-052) : URLs v3.1.1 -> v3.1.2, version 3.1.2 -> 3.1.3 ; AST triple VERT.
+
+| # | Test | Methode | Verdict |
+|---|------|---------|---------|
+| 1 | Release verifiee | `gh release view v3.1.2` -> assets `local-ai.exe` + `cloud-proxy.exe` ; URLs `.../download/v3.1.2/...` -> HTTP 200, `application/octet-stream`, tailles 195 156 992 / 19 915 776, magic MZ | OK |
+| 2 | Telechargement | racine vierge `C:\TestReleaseV312` (build\out neutralise) -> `Fallback core/bridge : telechargement depuis .../v3.1.2/...` + `garde-fou PE MZ OK + SHA-256 verifie` -> deploiement 87 composants | OK |
+| 3 | Coherence v3.1.2 | 0 BOM ; CLI bilingue v3.1.3 ; endpoints UP ; failover SSE ; vault AES-256-GCM ; 0 zombie | OK |
+
+- **Release** : https://github.com/xtrem21-source/AiTron-Releases-V3.1.1/releases/tag/v3.1.2
+- **Limites** : racine de test montee avec un junction `build` (cache local) ; rendu navigateur non verifie.
+- **Verdict : v3.1.3 LIVREE — Release GitHub v3.1.2 publiee, fallbacks a jour, VALIDEE AU VERT.**

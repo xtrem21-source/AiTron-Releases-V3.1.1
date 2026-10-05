@@ -2,6 +2,18 @@
 
 Format : `VERSION — DATE — RESUME`
 
+## v3.1.3 — 2026-10-05 (CREATION DE LA RELEASE GITHUB v3.1.2)
+**Release GitHub v3.1.2 publiee via `gh` CLI ; fallbacks bascules sur v3.1.2.**
+- **Release GitHub v3.1.2** creee par ligne de commande (`gh`) dans `xtrem21-source/AiTron-Releases-V3.1.1`
+  (l'interface web etait bloquee pour les gros fichiers) : assets `local-ai.exe` (195 156 992 o) et
+  `cloud-proxy.exe` (19 915 776 o), byte-identiques a la v3.1.1 (D-052).
+- **URLs de fallback** basculees de `download/v3.1.1/` vers `download/v3.1.2/` (SHA-256 inchanges).
+- **Version** : `__version__ = "3.1.3"` ; manifeste `installer_version = v3.1.3`.
+- **Tests** : T1 (release verifiee : 2 assets, tailles 186/19 Mo) ; T2 (installation en racine vierge ->
+  telechargement GitHub v3.1.2 + SHA-256 + garde-fou MZ -> deploiement) ; T3 (coherence v3.1.2 : 0 BOM,
+  CLI bilingue, failover SSE, vault, zero zombie). Voir `dev\BETA_TEST_REPORT.md` §52.
+- **Garde-fou PE "MZ"** conserve.
+
 ## v3.1.2 — 2026-10-05 (INTEGRATION DES BINAIRES GITHUB RELEASES)
 **Les binaires du coeur se telechargent desormais depuis une release GitHub perenne.**
 - **URLs GitHub Releases** (D-051) : `FALLBACK_LOCAL_AI_URL` / `FALLBACK_CLOUD_PROXY_URL` pointent vers

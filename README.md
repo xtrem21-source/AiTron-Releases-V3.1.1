@@ -6,7 +6,7 @@ AiTron V3 est un **fork independant de LocalAI** (licence MIT),
 enrichi d'une couche d'orchestration souveraine pour Windows : installeur unique,
 arborescence ouverte, doctrine transactionnelle, portabilite cle USB.
 
-**Version actuelle :** v3.1.2 (binaires GitHub Releases) — voir VERSION.
+**Version actuelle :** v3.1.3 (Release GitHub v3.1.2) — voir VERSION.
 
 ## Points cles
 - Installeur unique auto-suffisant (~330 Ko)

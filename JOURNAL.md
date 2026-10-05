@@ -1,5 +1,15 @@
 # Journal de bord — AiTron V3 (portage Windows natif)
 
+## 2026-10-05 — v3.1.3 : la Release GitHub v3.1.2 voit le jour
+
+**L'interface web bloquait, la ligne de commande a gagne.** Le bouton « Publish release » de GitHub
+restait grise avec des assets de 186 Mo. On a donc installe **GitHub CLI** (`winget`), authentifie via
+le jeton de **Git Credential Manager**, et cree la **Release v3.1.2** en une commande : les deux
+binaires (`local-ai.exe`, `cloud-proxy.exe`, byte-identiques a la v3.1.1) sont desormais heberges sous
+`releases/download/v3.1.2/`. Les **URLs de fallback** du script basculent en consequence, et la version
+passe a **v3.1.3**. **Preuves** : `gh release view` (2 assets), URLs verifiees (HTTP 200, magic MZ),
+installation en racine vierge reussie (telechargement GitHub -> SHA-256 -> deploiement). **v3.1.3 livree.**
+
 ## 2026-10-05 — v3.1.2 : les binaires arrivent par GitHub Releases
 
 **Fin des URLs temporaires.** v3.1.1 avait rendu l'installeur portable et pose un garde-fou PE "MZ" qui

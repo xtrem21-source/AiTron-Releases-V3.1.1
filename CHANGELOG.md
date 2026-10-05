@@ -2,6 +2,11 @@
 
 > Resume. Voir dev\CHANGELOG.md pour l'historique complet.
 
+## v3.1.3 — 2026-10-05 (Release GitHub v3.1.2)
+- Release GitHub v3.1.2 creee (gh CLI) : binaires local-ai.exe + cloud-proxy.exe
+- URLs de fallback basculees sur download/v3.1.2/ (SHA-256 inchanges)
+- Garde-fou PE "MZ" conserve
+
 ## v3.1.2 — 2026-10-05 (Binaires GitHub Releases)
 - Fallbacks de telechargement vers GitHub Releases (URLs perennes, binaires directs)
 - SHA-256 integres pour local-ai.exe et cloud-proxy.exe (verifies au telechargement)

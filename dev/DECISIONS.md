@@ -851,3 +851,19 @@
 - **Alternative ecartee** : hebergement hors GitHub (moins perenne, sans versionnage ni tag).
 - **Mesures** : Test 1 (telechargement GitHub -> deploiement) ; Test 2 (SHA errone -> rejet) ; Test 3
   (URL invalide -> cascade) ; harnais `build\test_v312_cascade.py`, `build\test_v312_sha_mismatch.py`.
+
+## D-052 — Creation de la Release GitHub v3.1.2 (upload via gh CLI)
+- **Date** : 2026-10-05
+- **Contexte** : la publication d'une release via l'interface web GitHub etait bloquee (bouton
+  « Publish release » grise avec les gros assets). Les binaires v3.1.2 sont byte-identiques a ceux de
+  la v3.1.1 (deja heberges).
+- **Decision** :
+  1. Installer **GitHub CLI** (`winget install --id GitHub.cli`) et creer la release en **ligne de
+     commande** : `gh release create v3.1.2 <local-ai.exe> <cloud-proxy.exe> ... --draft=false`.
+  2. Authentifier `gh` via le jeton **Git Credential Manager** (`git credential fill` -> `GH_TOKEN`),
+     `GH_TOKEN` etant accepte sans le scope `read:org` exige par `gh auth login`.
+  3. Basculer les URLs de fallback de `download/v3.1.1/` vers `download/v3.1.2/` (SHA-256 inchanges).
+- **Raison** : rendre le fallback coherent avec la version du script et contourner le bug de l'interface.
+- **Consequences** : `v3.1.3` du script ; manifeste `v3.1.3` ; garde-fou PE « MZ » conserve.
+- **Mesures** : `gh release view v3.1.2` -> 2 assets ; URLs v3.1.2 verifiees (HTTP 200, MZ) ;
+  installation en racine vierge reussie (fallback GitHub -> deploiement).
